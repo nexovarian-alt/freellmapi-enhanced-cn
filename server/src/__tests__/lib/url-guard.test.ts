@@ -33,7 +33,7 @@ describe('classifyIp', () => {
     expect(classifyIp('10.13.13.1')).toBe('private');
     expect(classifyIp('172.16.0.1')).toBe('private');
     expect(classifyIp('172.31.255.255')).toBe('private');
-    expect(classifyIp('192.168.1.20')).toBe('private');
+    expect(classifyIp('192.0.2.20')).toBe('private');
     expect(classifyIp('100.64.0.1')).toBe('private'); // CGNAT
     expect(classifyIp('fc00::1')).toBe('private'); // ULA
     expect(classifyIp('fd12:3456::1')).toBe('private');
@@ -106,13 +106,13 @@ describe('assessProviderUrl', () => {
   it('allows loopback and private LAN targets by default (local Ollama)', async () => {
     expect((await assessProviderUrl('http://localhost:11434/v1', { resolve: async () => ['127.0.0.1'] })).allowed).toBe(true);
     expect((await assessProviderUrl('http://127.0.0.1:8080/v1')).allowed).toBe(true);
-    expect((await assessProviderUrl('http://192.168.1.20:11434/v1')).allowed).toBe(true);
+    expect((await assessProviderUrl('http://192.0.2.20:11434/v1')).allowed).toBe(true);
   });
 
   it('blocks loopback and private targets under FREEAPI_BLOCK_PRIVATE_PROVIDER_URLS', async () => {
     process.env.FREEAPI_BLOCK_PRIVATE_PROVIDER_URLS = 'true';
     expect((await assessProviderUrl('http://127.0.0.1:8080/v1')).allowed).toBe(false);
-    expect((await assessProviderUrl('http://192.168.1.20:11434/v1')).allowed).toBe(false);
+    expect((await assessProviderUrl('http://192.0.2.20:11434/v1')).allowed).toBe(false);
     expect((await assessProviderUrl('http://10.0.0.5:3000/v1')).allowed).toBe(false);
     // Metadata stays blocked, public stays allowed.
     expect((await assessProviderUrl('http://169.254.169.254/')).allowed).toBe(false);
