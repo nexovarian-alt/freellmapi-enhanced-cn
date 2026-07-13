@@ -387,7 +387,7 @@ another machine or into a container):
 
 | OS | Location |
 |----|----------|
-| Windows | `%APPDATA%\FreeLLMAPI\` (e.g. `C:\Users\<you>\AppData\Roaming\FreeLLMAPI\`) |
+| Windows | `%APPDATA%\FreeLLMAPI\` |
 | macOS | `~/Library/Application Support/FreeLLMAPI/` |
 | Linux | `~/.config/FreeLLMAPI/` |
 
