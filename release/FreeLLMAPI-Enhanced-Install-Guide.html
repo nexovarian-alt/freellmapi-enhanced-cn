@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FreeLLMAPI Enhanced v1.0 安装教程</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;max-width:900px;margin:0 auto;padding:32px;line-height:1.7;color:#202124;background:#fafafa}
+    h1{line-height:1.25} h2{margin-top:2em;border-bottom:1px solid #ddd;padding-bottom:6px}
+    code{background:#eee;padding:2px 5px;border-radius:4px} pre{background:#1f2937;color:#f9fafb;padding:14px;border-radius:8px;overflow:auto}
+    .note{background:#fff8e1;border-left:4px solid #e0a800;padding:10px 14px}.ok{background:#e8f5e9;border-left:4px solid #2e7d32;padding:10px 14px}
+  </style>
+</head>
+<body>
+<h1>FreeLLMAPI Enhanced v1.0 安装教程</h1>
+<p>这是一个把多个 AI 平台统一到一个网页和 API 地址的本地工具。你的 API Key 和数据保存在自己的设备上。</p>
+
+<h2>A. 项目介绍</h2>
+<p>Enhanced v1.0 在官方 FreeLLMAPI 基础上提供百度千帆、阿里云百炼，并保留 Google、Groq、OpenRouter 等平台。国内模型资源池会保留免费模型记录，不可用模型会暂时停用而不会删除。</p>
+
+<h2>B. Windows 安装方式</h2>
+<p>安装 Docker Desktop 并启动，然后使用项目提供的安装包或在 WSL2（Ubuntu）中运行：</p>
+<pre>bash install-freellmapi.sh</pre>
+<p>安装完成后打开脚本显示的本机地址。Windows PowerShell 专用安装脚本暂不提供。</p>
+
+<h2>C. Linux/NAS 安装方式</h2>
+<p>确认 Docker 已启动，在终端执行：</p>
+<pre>chmod +x install-freellmapi.sh
+./install-freellmapi.sh</pre>
+<p>脚本会检查环境、下载固定版本、启动容器并显示访问地址和 Setup Code。</p>
+
+<h2>D. macOS 安装方式</h2>
+<p>安装并启动 Docker Desktop，打开“终端”，在项目目录运行上面的 Bash 命令。首次运行可能需要允许 Docker Desktop 的网络访问。</p>
+
+<h2>E. 已有 Docker 环境安装</h2>
+<p>直接运行安装脚本即可。默认端口为 3004，如被占用可指定其他端口：</p>
+<pre>FREELLMAPI_PORT=3104 ./install-freellmapi.sh</pre>
+
+<h2>F. 已安装原版 FreeLLMAPI 用户如何升级</h2>
+<p>Enhanced 使用独立安装目录、容器和数据目录。建议先备份原版数据，再使用新的安装目录和端口安装，不要覆盖原版容器。确认 Enhanced 正常后，再手动迁移需要的设置。</p>
+
+<h2>G. 首次登录流程</h2>
+<ol><li>打开安装完成提示中的网页地址。</li><li>输入 Setup Code。</li><li>创建管理员账号。</li><li>进入“密钥”页面添加 API Key。</li></ol>
+
+<h2>H. Setup Code 说明</h2>
+<p>Setup Code 只用于首次创建管理员账号。安装脚本会自动显示它；若没有显示，可执行：</p>
+<pre>docker logs freellmapi-enhanced 2&gt;&amp;1 | grep -i "setup code"</pre>
+<div class="note">请勿把 Setup Code 或 API Key 发布到公开网页、截图或聊天群。</div>
+
+<h2>I. 百度千帆配置</h2>
+<p>在百度智能云千帆控制台创建 API Key，在 FreeLLMAPI 的“密钥”页面选择“百度千帆”，粘贴 Key 并保存。优先使用 <code>ernie-4.5-turbo-128k</code>；其余暂禁用模型需要先确认账号权限和额度。</p>
+
+<h2>J. 阿里云百炼配置</h2>
+<p>在百炼控制台创建 API Key，选择“阿里云百炼”并保存。可用模型包括 Qwen、DeepSeek 等；免费额度和可调用模型取决于账号状态。</p>
+
+<h2>K. Google、Groq、OpenRouter 配置</h2>
+<p>分别在对应平台创建 API Key，在“密钥”页面选择平台后保存。保存后先查看健康状态，再在“试玩台”选择模型发送一条简单消息。</p>
+<div class="ok">遇到模型不可用时，先检查 Key 是否有效、模型是否已开通、免费额度是否仍可用。</div>
+
+<h2>L. NAS 或受限网络代理（可选）</h2>
+<p>如果服务器无法直接访问 Google 或 Groq，可在 Docker 容器环境变量中配置代理。没有代理时无需设置，默认行为保持不变。</p>
+<pre>HTTP_PROXY=http://代理服务器:端口
+HTTPS_PROXY=http://代理服务器:端口</pre>
+<p>例如使用 NAS 上的代理：<code>HTTP_PROXY=http://proxy-host:port</code>、<code>HTTPS_PROXY=http://proxy-host:port</code>。将 <code>proxy-host:port</code> 替换为你自己的代理地址。修改后只重建或重启 Enhanced 实例，并重新检查对应密钥健康状态。</p>
+
+<h2>M. 升级与加密密钥</h2>
+<p>安装器会在首次安装时生成并保存 <code>ENCRYPTION_KEY</code>。它保存在安装目录的 <code>.env</code>，数据目录还会保留 <code>.encryption-key</code>。重新创建容器或升级镜像时，安装器会优先复用已有密钥，确保已保存的 API Key 可以继续解密。</p>
+<div class="note">不要删除、改名或公开 <code>.env</code> 和 <code>.encryption-key</code>。备份数据目录时请同时备份这两个密钥文件。</div>
+</body>
+</html>
