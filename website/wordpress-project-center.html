@@ -1,0 +1,361 @@
+<style>
+.freellmapi-project-hub{--fl-blue:#2563eb;--fl-blue-soft:#eff6ff;--fl-ink:#172033;--fl-muted:#667085;--fl-line:#e5e7eb;--fl-bg:#f7f8fa;--fl-card:#fff;--fl-warn:#fff7ed;--fl-warn-line:#fdba74;color:var(--fl-ink);font-family:inherit;line-height:1.75;word-break:break-word}
+.freellmapi-project-hub *{box-sizing:border-box}
+.freellmapi-project-hub a{color:var(--fl-blue);text-decoration:none}
+.freellmapi-project-hub a:hover{text-decoration:none;opacity:.88}
+.freellmapi-project-hub .fl-wrap{width:min(1120px,calc(100% - 32px));margin:0 auto}
+.freellmapi-project-hub .fl-section{padding:54px 0;border-bottom:1px solid var(--fl-line)}
+.freellmapi-project-hub .fl-section:last-child{border-bottom:0}
+.freellmapi-project-hub .fl-kicker{margin:0 0 8px;color:var(--fl-blue);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.freellmapi-project-hub h1,.freellmapi-project-hub h2,.freellmapi-project-hub h3{color:var(--fl-ink);line-height:1.3;margin-top:0}
+.freellmapi-project-hub h1{font-size:clamp(34px,5vw,58px);margin-bottom:18px;letter-spacing:-.035em}
+.freellmapi-project-hub h2{font-size:clamp(26px,3.2vw,36px);margin-bottom:12px}
+.freellmapi-project-hub h3{font-size:19px;margin-bottom:8px}
+.freellmapi-project-hub p{margin:0 0 14px}
+.freellmapi-project-hub .fl-lead{max-width:760px;color:var(--fl-muted);font-size:18px}
+.freellmapi-project-hub .fl-hero{padding:70px 0 60px;background:linear-gradient(145deg,#f8fbff 0%,#fff 55%,#f7f8fa 100%);border:1px solid var(--fl-line);border-radius:18px}
+.freellmapi-project-hub .fl-hero .fl-wrap{padding:0 22px}
+.freellmapi-project-hub .fl-version{display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;padding:6px 12px;border:1px solid #bfdbfe;border-radius:999px;background:var(--fl-blue-soft);color:#1d4ed8;font-size:14px;font-weight:700}
+.freellmapi-project-hub .fl-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.freellmapi-project-hub .fl-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:var(--fl-ink);font-weight:700;transition:transform .15s ease,box-shadow .15s ease}
+.freellmapi-project-hub .fl-btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(15,23,42,.08)}
+.freellmapi-project-hub .fl-btn-primary{border-color:var(--fl-blue);background:var(--fl-blue);color:#fff}
+.freellmapi-project-hub .fl-grid{display:grid;gap:16px}
+.freellmapi-project-hub .fl-grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.freellmapi-project-hub .fl-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.freellmapi-project-hub .fl-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.freellmapi-project-hub .fl-card{padding:22px;border:1px solid var(--fl-line);border-radius:12px;background:var(--fl-card)}
+.freellmapi-project-hub .fl-card p{color:var(--fl-muted);margin-bottom:0}
+.freellmapi-project-hub .fl-number{display:inline-grid;place-items:center;width:32px;height:32px;margin-bottom:14px;border-radius:50%;background:var(--fl-blue-soft);color:var(--fl-blue);font-weight:800}
+.freellmapi-project-hub .fl-chip-list{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
+.freellmapi-project-hub .fl-chip{padding:7px 11px;border:1px solid var(--fl-line);border-radius:999px;background:#fff;font-size:14px}
+.freellmapi-project-hub .fl-platform a{display:block;height:100%;color:inherit}
+.freellmapi-project-hub .fl-platform strong{display:block;margin-bottom:5px}
+.freellmapi-project-hub .fl-platform span{color:var(--fl-muted);font-size:14px}
+.freellmapi-project-hub .fl-note{margin:18px 0;padding:16px 18px;border-left:4px solid var(--fl-blue);border-radius:8px;background:var(--fl-blue-soft)}
+.freellmapi-project-hub .fl-warning{border-left-color:#f97316;background:var(--fl-warn)}
+.freellmapi-project-hub .fl-warning strong{color:#9a3412}
+.freellmapi-project-hub details{margin:12px 0;border:1px solid var(--fl-line);border-radius:10px;background:#fff;overflow:hidden}
+.freellmapi-project-hub summary{cursor:pointer;padding:16px 18px;font-weight:750;list-style:none}
+.freellmapi-project-hub summary::-webkit-details-marker{display:none}
+.freellmapi-project-hub summary::after{content:'＋';float:right;color:var(--fl-blue)}
+.freellmapi-project-hub details[open] summary{border-bottom:1px solid var(--fl-line);background:#fafafa}
+.freellmapi-project-hub details[open] summary::after{content:'－'}
+.freellmapi-project-hub .fl-detail-body{padding:18px}
+.freellmapi-project-hub pre{max-width:100%;overflow:auto;margin:14px 0;padding:16px;border-radius:9px;background:#111827;color:#e5e7eb;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}
+.freellmapi-project-hub code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.freellmapi-project-hub :not(pre)>code{padding:2px 6px;border-radius:5px;background:#f1f5f9;color:#334155;font-size:.92em}
+.freellmapi-project-hub .fl-steps{counter-reset:fl-step}
+.freellmapi-project-hub .fl-step{position:relative;padding-left:50px}
+.freellmapi-project-hub .fl-step::before{counter-increment:fl-step;content:counter(fl-step);position:absolute;left:0;top:0;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--fl-blue);color:#fff;font-weight:800}
+.freellmapi-project-hub .fl-copybox{width:100%;min-height:300px;padding:16px;border:1px solid var(--fl-line);border-radius:9px;background:#fafafa;color:#344054;font:14px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical}
+.freellmapi-project-hub .fl-release{border-left:3px solid var(--fl-blue)}
+.freellmapi-project-hub .fl-meta{display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:14px;color:var(--fl-muted);font-size:14px}
+.freellmapi-project-hub .fl-link-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.freellmapi-project-hub .fl-link-list a{display:flex;justify-content:space-between;gap:12px;padding:13px 15px;border:1px solid var(--fl-line);border-radius:9px;background:#fff;color:var(--fl-ink)}
+.freellmapi-project-hub .fl-link-list a span:last-child{color:var(--fl-blue)}
+.freellmapi-project-hub .fl-small{color:var(--fl-muted);font-size:14px}
+@media (max-width:900px){.freellmapi-project-hub .fl-grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}.freellmapi-project-hub .fl-grid-3{grid-template-columns:1fr}.freellmapi-project-hub .fl-grid-2{grid-template-columns:1fr}}
+@media (max-width:600px){.freellmapi-project-hub .fl-wrap{width:min(100% - 20px,1120px)}.freellmapi-project-hub .fl-section{padding:40px 0}.freellmapi-project-hub .fl-hero{padding:48px 0 42px;border-radius:12px}.freellmapi-project-hub .fl-grid-4{grid-template-columns:1fr}.freellmapi-project-hub .fl-card{padding:18px}.freellmapi-project-hub .fl-btn{width:100%}.freellmapi-project-hub pre{font-size:12px}.freellmapi-project-hub .fl-copybox{min-height:390px}}
+</style>
+
+<div class="freellmapi-project-hub">
+  <section class="fl-hero" id="overview">
+    <div class="fl-wrap">
+      <div class="fl-version">当前正式版 · v1.1.0</div>
+      <p class="fl-kicker">FreeLLMAPI Enhanced CN</p>
+      <h1>面向中国用户增强的免费 AI API 聚合与管理平台</h1>
+      <p class="fl-lead">统一管理国内外免费 AI 平台，让普通用户也能通过 Docker、Windows、Mac 或 NAS 部署自己的 AI API 服务。保持熟悉的 FreeLLMAPI 使用体验，同时让安装、网络连接和故障排查更简单。</p>
+      <div class="fl-actions">
+        <a class="fl-btn fl-btn-primary" href="#install">快速安装</a>
+        <a class="fl-btn" href="#upgrade">查看升级方法</a>
+        <a class="fl-btn" href="https://github.com/nexovarian-alt/freellmapi-enhanced-cn" target="_blank" rel="noopener noreferrer">GitHub 项目</a>
+        <a class="fl-btn" href="#releases">查看版本记录</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="fl-section" id="value">
+    <div class="fl-wrap">
+      <p class="fl-kicker">核心价值</p>
+      <h2>把复杂留在系统里，把简单留给用户</h2>
+      <div class="fl-grid fl-grid-4">
+        <article class="fl-card"><div class="fl-number">1</div><h3>免费 AI 统一管理</h3><p>在一个网页中添加和管理多个 Provider，AI 客户端只需要连接一个统一入口。</p></article>
+        <article class="fl-card"><div class="fl-number">2</div><h3>中国网络增强</h3><p>Docker 可以连接用户自己已有的正常代理环境，改善海外 AI 服务连接问题。</p></article>
+        <article class="fl-card"><div class="fl-number">3</div><h3>Provider 智能诊断</h3><p>分别查看网络、认证、额度和模型状态，不再把所有错误都误认为 Key 失效。</p></article>
+        <article class="fl-card"><div class="fl-number">4</div><h3>故障自动恢复</h3><p>临时故障恢复后，系统会重新启用由系统自动关闭的 Provider，无需反复添加 Key。</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="fl-section" id="platforms">
+    <div class="fl-wrap">
+      <p class="fl-kicker">支持的平台与设备</p>
+      <h2>国内外 AI 服务，在一个中心协同工作</h2>
+      <div class="fl-grid fl-grid-2">
+        <div class="fl-card">
+          <h3>国内 Provider</h3>
+          <div class="fl-chip-list">
+            <a class="fl-chip" href="https://console.bce.baidu.com/qianfan/overview" target="_blank" rel="noopener noreferrer">百度千帆 ↗</a>
+            <a class="fl-chip" href="https://bailian.console.aliyun.com/" target="_blank" rel="noopener noreferrer">阿里云百炼 ↗</a>
+          </div>
+        </div>
+        <div class="fl-card">
+          <h3>海外 Provider</h3>
+          <div class="fl-chip-list">
+            <a class="fl-chip" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio ↗</a>
+            <a class="fl-chip" href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Groq ↗</a>
+            <a class="fl-chip" href="https://openrouter.ai/settings/keys" target="_blank" rel="noopener noreferrer">OpenRouter ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="fl-chip-list" aria-label="支持的部署环境">
+        <span class="fl-chip">Windows Docker Desktop</span><span class="fl-chip">Mac Docker Desktop</span><span class="fl-chip">Linux Docker</span><span class="fl-chip">群晖 NAS</span><span class="fl-chip">其他 Docker NAS</span>
+      </div>
+      <p class="fl-small">各平台的免费额度、模型、定价和服务规则由对应平台决定。本项目只帮助用户更方便地管理和使用自己的 AI 服务。</p>
+    </div>
+  </section>
+
+  <section class="fl-section" id="quick-start">
+    <div class="fl-wrap">
+      <p class="fl-kicker">三步快速开始</p>
+      <h2>从安装到添加第一个 Provider</h2>
+      <div class="fl-grid fl-grid-3 fl-steps">
+        <article class="fl-card fl-step"><h3>安装 Docker</h3><p>Windows、Mac 安装 Docker Desktop；群晖安装 Container Manager；Linux 安装 Docker Engine。</p></article>
+        <article class="fl-card fl-step"><h3>启动项目</h3><p>使用固定的 v1.1.0 镜像和 Compose 文件启动，数据保存在独立 Volume 或目录。</p></article>
+        <article class="fl-card fl-step"><h3>打开网页并添加 Provider</h3><p>访问 3002 端口，建议依次添加阿里云百炼、百度千帆、OpenRouter、Google AI Studio、Groq。</p></article>
+      </div>
+      <div class="fl-note"><strong>统一访问示例：</strong>本机使用 <code>http://localhost:3002</code>；NAS 使用 <code>http://你的设备IP:3002</code>。</div>
+    </div>
+  </section>
+
+  <section class="fl-section" id="install">
+    <div class="fl-wrap">
+      <p class="fl-kicker">完整安装教程</p>
+      <h2>选择你的设备，展开对应教程</h2>
+      <p class="fl-lead">教程使用正式镜像 <code>ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0</code>，页面端口统一为 3002。</p>
+
+      <details>
+        <summary>Windows Docker Desktop 安装教程</summary>
+        <div class="fl-detail-body">
+          <h3>准备条件</h3><p>安装并启动 Docker Desktop；准备一个专用文件夹。</p>
+          <h3>生成加密密钥</h3>
+          <pre><code>$bytes = New-Object byte[] 32
+$rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
+$rng.GetBytes($bytes); $rng.Dispose()
+$key = -join ($bytes | ForEach-Object { $_.ToString('x2') })
+"ENCRYPTION_KEY=$key`nPORT=3002" | Out-File -Encoding ascii .env</code></pre>
+          <h3>docker-compose.yml</h3>
+          <pre><code>services:
+  freellmapi:
+    image: ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0
+    env_file: [.env]
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      PROXY_URL: ${PROXY_URL:-}
+      NODE_OPTIONS: --require=/app/bootstrap-proxy.cjs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:${PORT:-3002}:3001"
+    volumes:
+      - freellmapi-data:/app/server/data
+    restart: unless-stopped
+volumes:
+  freellmapi-data:</code></pre>
+          <p>启动：<code>docker compose pull</code>，再执行 <code>docker compose up -d</code>。</p>
+          <p>访问：<code>http://localhost:3002</code>。执行 <code>docker compose ps</code>，看到容器为 running 或 healthy 即安装成功。</p>
+          <div class="fl-note fl-warning"><strong>常见错误：</strong>3002 被占用时换一个未使用端口；Docker 未运行时先打开 Docker Desktop；海外 Provider 连接失败时检查代理。</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>Mac Docker Desktop 安装教程</summary>
+        <div class="fl-detail-body">
+          <h3>准备条件</h3><p>安装适合 Intel 或 Apple 芯片的 Docker Desktop，并确认 Docker 已运行。</p>
+          <h3>准备 .env</h3><pre><code>printf "ENCRYPTION_KEY=%s\nPORT=3002\n" "$(openssl rand -hex 32)" &gt; .env</code></pre>
+          <h3>docker-compose.yml</h3>
+          <pre><code>services:
+  freellmapi:
+    image: ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0
+    env_file: [.env]
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      PROXY_URL: ${PROXY_URL:-}
+      NODE_OPTIONS: --require=/app/bootstrap-proxy.cjs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:${PORT:-3002}:3001"
+    volumes:
+      - freellmapi-data:/app/server/data
+    restart: unless-stopped
+volumes:
+  freellmapi-data:</code></pre>
+          <p>运行 <code>docker compose pull</code> 和 <code>docker compose up -d</code>，再打开 <code>http://localhost:3002</code>。</p>
+          <div class="fl-note fl-warning"><strong>常见错误：</strong>代理端口不是 7890 时必须填写实际端口；不要在升级时重新生成 ENCRYPTION_KEY。</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>群晖 NAS 安装教程</summary>
+        <div class="fl-detail-body">
+          <h3>准备条件</h3><p>安装 Container Manager，在 File Station 创建 <code>/volume1/docker/freellmapi-enhanced-cn/data</code>。存储空间名称不同的用户请替换实际路径。</p>
+          <h3>Container Manager 项目 Compose</h3>
+          <pre><code>services:
+  freellmapi:
+    image: ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      ENCRYPTION_KEY: "请替换为自己生成的64位十六进制密钥"
+      NODE_OPTIONS: --require=/app/bootstrap-proxy.cjs
+      PROXY_URL: "http://192.168.x.x:7890"
+    ports:
+      - "3002:3001"
+    volumes:
+      - /volume1/docker/freellmapi-enhanced-cn/data:/app/server/data
+    restart: unless-stopped</code></pre>
+          <p>只使用国内 Provider 时可把 <code>PROXY_URL</code> 留空。启动项目后访问 <code>http://你的设备IP:3002</code>。</p>
+          <p>首次从其他设备访问时，如果页面要求 Setup Code，请从容器启动日志中查找并填写，不要公开这个 Code。</p>
+          <div class="fl-note fl-warning"><strong>常见错误：</strong>代理地址不能写 127.0.0.1；代理软件必须允许局域网连接；数据目录需要正确读写权限。</div>
+        </div>
+      </details>
+
+      <details>
+        <summary>Linux 与通用 Docker 安装教程</summary>
+        <div class="fl-detail-body">
+          <h3>准备条件</h3><p>安装 Docker Engine 和 Docker Compose，确认当前用户可以运行 Docker。</p>
+          <h3>准备 .env</h3><pre><code>printf "ENCRYPTION_KEY=%s\nPORT=3002\nHOST_BIND=0.0.0.0\n" "$(openssl rand -hex 32)" &gt; .env</code></pre>
+          <h3>docker-compose.yml</h3>
+          <pre><code>services:
+  freellmapi:
+    image: ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0
+    env_file: [.env]
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      PROXY_URL: ${PROXY_URL:-}
+      NODE_OPTIONS: --require=/app/bootstrap-proxy.cjs
+    ports:
+      - "${HOST_BIND:-127.0.0.1}:${PORT:-3002}:3001"
+    volumes:
+      - freellmapi-data:/app/server/data
+    restart: unless-stopped
+volumes:
+  freellmapi-data:</code></pre>
+          <p>运行 <code>docker compose pull</code> 和 <code>docker compose up -d</code>，从局域网访问 <code>http://你的设备IP:3002</code>。</p>
+          <div class="fl-note fl-warning"><strong>常见错误：</strong>防火墙未允许 3002、端口冲突或 Volume 权限错误。只在可信任的家庭局域网开放访问。</div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="fl-section" id="proxy">
+    <div class="fl-wrap">
+      <p class="fl-kicker">代理配置说明</p>
+      <h2>连接你自己已有的正常网络环境</h2>
+      <p>百度千帆、阿里云百炼等国内 Provider 通常可以直接使用。Google AI Studio、Groq、OpenRouter 等海外 Provider 是否可用，取决于用户自己的网络环境。</p>
+      <div class="fl-grid fl-grid-2">
+        <div class="fl-card"><h3>Windows / Mac Docker Desktop</h3><pre><code>PROXY_URL=http://host.docker.internal:7890</code></pre><p>7890 是常见 HTTP 代理端口，请以代理软件实际设置为准。</p></div>
+        <div class="fl-card"><h3>NAS / Linux</h3><pre><code>PROXY_URL=http://192.168.x.x:7890</code></pre><p>填写运行代理软件的设备局域网 IP，并在代理软件中允许局域网连接。</p></div>
+      </div>
+      <div class="fl-note">本项目不提供、不宣传代理服务，也不提供绕过限制的方法；这里只说明 Docker 如何连接用户自己已有的合法网络环境。</div>
+    </div>
+  </section>
+
+  <section class="fl-section" id="upgrade">
+    <div class="fl-wrap">
+      <p class="fl-kicker">升级与回滚</p>
+      <h2>升级不需要重新添加 Provider</h2>
+      <p>正确升级会保留 API Key、Provider 配置、用户配置、数据库和统计数据。</p>
+      <pre><code>docker compose pull
+docker compose up -d</code></pre>
+      <div class="fl-note fl-warning"><strong>升级前请确认：</strong>不要删除 Volume；不要删除数据目录；不要重新初始化数据库；必须保留原来的 ENCRYPTION_KEY。</div>
+      <details>
+        <summary>需要回滚时怎么做</summary>
+        <div class="fl-detail-body"><p>先停止当前容器并备份数据目录，把 Compose 中的镜像标签改回之前记录的版本，然后重新启动。保持 Volume 映射和 ENCRYPTION_KEY 不变。不要执行带 <code>-v</code> 的删除命令。</p></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="fl-section" id="faq">
+    <div class="fl-wrap">
+      <p class="fl-kicker">常见问题</p>
+      <h2>先判断原因，再决定操作</h2>
+      <details><summary>Google 或 Groq 显示异常怎么办？</summary><div class="fl-detail-body"><p>先检查代理软件是否运行、代理端口是否正确，再点击“立即检测全部 Provider”。不要因为一次失败就删除 Key。</p></div></details>
+      <details><summary>为什么 NAS 本身能访问海外服务，但 Docker 容器不能？</summary><div class="fl-detail-body"><p>容器不会自动继承 NAS 或电脑的代理。需要在 Compose 中填写 PROXY_URL；NAS 使用运行代理软件的设备局域网 IP，不能填写 127.0.0.1。</p></div></details>
+      <details><summary>Provider 突然异常是否代表 Key 失效？</summary><div class="fl-detail-body"><p>不一定。也可能是网络波动、代理未启动、上游服务临时异常或额度不足。v1.1.0 会分别显示网络、认证、额度和模型状态。</p></div></details>
+      <details><summary>如何使用“立即检测全部 Provider”？</summary><div class="fl-detail-body"><p>进入 Provider 或密钥页面，点击“立即检测全部 Provider”，等待检测结束并刷新状态。修改代理或 Key 后可以立即使用，无需等待后台周期检查。</p></div></details>
+      <details><summary>国内 Provider 是否需要代理？</summary><div class="fl-detail-body"><p>百度千帆、阿里云百炼通常可以直接使用。只有实际网络需要时才配置代理。</p></div></details>
+      <details><summary>升级后 Key 没有显示怎么办？</summary><div class="fl-detail-body"><p>检查新容器是否仍挂载原 Volume 或数据目录，以及是否继续使用原 ENCRYPTION_KEY。不要在空 Volume 中继续添加新数据。</p></div></details>
+      <details><summary>Docker 显示 unhealthy 怎么办？</summary><div class="fl-detail-body"><p>确认镜像标签是 v1.1.0，执行 <code>docker compose pull</code> 和 <code>docker compose up -d</code>。v1.1.0 已修复代理影响健康检查的问题。</p></div></details>
+      <details><summary>忘记 ENCRYPTION_KEY 怎么办？</summary><div class="fl-detail-body"><p>先查找原来的 .env、Compose、密码管理器或备份。不要生成新 Key 覆盖旧配置，否则原 Provider Key 可能无法解密。</p></div></details>
+      <details><summary>如何备份数据？</summary><div class="fl-detail-body"><p>同时备份数据 Volume 对应目录、Compose 文件和 .env。NAS 用户备份映射到 <code>/app/server/data</code> 的宿主机目录。备份文件不要公开上传。</p></div></details>
+      <details><summary>如何确认正在使用 v1.1.0？</summary><div class="fl-detail-body"><p>检查 Compose 的 image 标签是否为 <code>ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0</code>，重新拉取后再查看容器使用的镜像。</p></div></details>
+    </div>
+  </section>
+
+  <section class="fl-section" id="ai-helper">
+    <div class="fl-wrap">
+      <p class="fl-kicker">AI 故障诊断助手</p>
+      <h2>遇到问题？复制下面的内容发给 AI</h2>
+      <p>发送前请遮挡 API Key、Setup Code、ENCRYPTION_KEY、私人地址和完整日志。</p>
+      <textarea class="fl-copybox" readonly aria-label="FreeLLMAPI AI 故障诊断提示词">你现在是 FreeLLMAPI Enhanced CN v1.1.0 技术助手。请使用中文，为不懂编程的普通用户排查问题。
+
+我的环境：
+系统：Windows / Mac / 群晖 NAS / Linux
+Docker 状态：
+访问地址：请隐藏私人地址
+使用的 Provider：
+是否配置代理：是 / 否
+页面显示的网络、认证、额度和模型状态：
+最近做过的操作：
+
+请遵守：
+1. 先判断问题特征，不要直接认定 Key 失效。
+2. 先建议执行“立即检测全部 Provider”。
+3. 区分网络、认证、额度和模型问题。
+4. 不要让我删除 Volume、数据目录或数据库。
+5. 不要让我重新初始化或修改项目代码。
+6. 升级问题优先确认原 Volume 和 ENCRYPTION_KEY 是否保留。
+7. 一次只给少量、安全、普通用户可以执行的步骤。
+8. 每一步说明正常情况下应该看到什么。
+
+请先告诉我最可能的原因，再给出最安全的处理步骤。</textarea>
+    </div>
+  </section>
+
+  <section class="fl-section" id="releases">
+    <div class="fl-wrap">
+      <p class="fl-kicker">版本历史</p>
+      <h2>每个正式版本都保留独立记录</h2>
+      <details class="fl-release" open>
+        <summary>v1.1.0 · 当前正式版</summary>
+        <div class="fl-detail-body">
+          <div class="fl-meta"><span>发布日期：2026-07-15</span><span>镜像：v1.1.0</span></div>
+          <h3>核心新增</h3><p>中国网络增强、海外 Provider 代理支持、Provider 智能诊断、手动全部检测和自动恢复机制。</p>
+          <h3>核心修复</h3><p>减少海外 Provider 误判，修复 OpenRouter 检测和 Docker Healthcheck 问题。</p>
+          <h3>升级说明</h3><p>数据库采用增量升级，保留原 Volume、数据目录和 ENCRYPTION_KEY 后，无需重新添加 Provider。</p>
+          <p><a href="https://github.com/nexovarian-alt/freellmapi-enhanced-cn/releases/tag/v1.1.0" target="_blank" rel="noopener noreferrer">查看 GitHub Release ↗</a></p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="fl-section" id="articles">
+    <div class="fl-wrap">
+      <p class="fl-kicker">相关文章</p>
+      <h2>FreeLLMAPI 内容统一入口</h2>
+      <ul class="fl-link-list">
+        <li><a href="https://fuliapp.top/archives/category/freellmapi"><span>浏览 FreeLLMAPI 分类文章</span><span>→</span></a></li>
+        <li><a href="https://github.com/nexovarian-alt/freellmapi-enhanced-cn" target="_blank" rel="noopener noreferrer"><span>GitHub 项目与使用文档</span><span>↗</span></a></li>
+        <li><a href="https://fuliapp.top/archives/2550.html"><span>FreeLLMAPI Enhanced CN v1.1.0 正式发布</span><span>→</span></a></li>
+        <li><a href="https://github.com/nexovarian-alt/freellmapi-enhanced-cn/releases/tag/v1.1.0" target="_blank" rel="noopener noreferrer"><span>GitHub Release v1.1.0</span><span>↗</span></a></li>
+      </ul>
+      <p class="fl-small">本页是长期项目中心。以后发布新版本时，只更新发生变化的区域，并把旧版本完整保留在版本历史中。</p>
+    </div>
+  </section>
+</div>

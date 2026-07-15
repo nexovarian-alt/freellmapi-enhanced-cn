@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FreeLLMAPI Enhanced CN v1.0.1，让强大的 AI 聚合能力真正适合中文用户。">
+  <title>FreeLLMAPI Enhanced CN — 中文用户的 AI 基础设施</title>
+  <style>
+    :root {
+      --bg: #03050a;
+      --bg-soft: #070b14;
+      --panel: rgba(13, 19, 34, .68);
+      --panel-strong: rgba(16, 23, 42, .9);
+      --line: rgba(150, 170, 255, .14);
+      --line-bright: rgba(127, 158, 255, .34);
+      --text: #f3f6ff;
+      --muted: #8e9ab7;
+      --blue: #5a8cff;
+      --cyan: #53ddff;
+      --purple: #9c67ff;
+      --green: #50e7a4;
+      --red: #ff5f76;
+      --amber: #ffc66d;
+      --radius: 28px;
+      --shadow: 0 32px 90px rgba(0, 0, 0, .45);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(900px 520px at 50% -180px, rgba(74, 76, 212, .28), transparent 68%),
+        linear-gradient(180deg, #050711 0%, var(--bg) 32%, #050711 100%);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+      opacity: .16;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    canvas#particles { position: fixed; inset: 0; z-index: -1; opacity: .75; pointer-events: none; }
+    .progress { position: fixed; top: 0; left: 0; z-index: 120; width: 0; height: 2px; background: linear-gradient(90deg, var(--cyan), var(--blue), var(--purple)); box-shadow: 0 0 18px var(--blue); }
+    .container { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+    .nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 90;
+      width: min(1060px, calc(100% - 28px));
+      height: 62px;
+      padding: 0 12px 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 20px;
+      background: rgba(5, 8, 16, .62);
+      backdrop-filter: blur(24px) saturate(145%);
+      box-shadow: 0 14px 45px rgba(0,0,0,.28);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-size: 14px; font-weight: 720; letter-spacing: -.01em; }
+    .brand-mark { position: relative; width: 25px; height: 25px; border: 1px solid rgba(138,163,255,.55); border-radius: 8px; background: linear-gradient(135deg, rgba(82,222,255,.25), rgba(155,102,255,.28)); box-shadow: inset 0 0 14px rgba(103,138,255,.25), 0 0 20px rgba(103,138,255,.25); }
+    .brand-mark::before, .brand-mark::after { content: ""; position: absolute; border-radius: 50%; background: #9fe8ff; box-shadow: 0 0 8px #6ccfff; }
+    .brand-mark::before { width: 5px; height: 5px; left: 5px; top: 5px; }
+    .brand-mark::after { width: 4px; height: 4px; right: 5px; bottom: 5px; }
+    .nav-links { display: flex; align-items: center; gap: 25px; color: var(--muted); font-size: 13px; }
+    .nav-links a { transition: color .25s; }
+    .nav-links a:hover { color: #fff; }
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
+    .nav-cta, .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 18px;
+      border: 1px solid rgba(152,171,255,.2);
+      border-radius: 13px;
+      color: #eef2ff;
+      background: rgba(255,255,255,.055);
+      transition: transform .25s, border-color .25s, box-shadow .25s, background .25s;
+      cursor: pointer;
+    }
+    .nav-cta { font-size: 13px; min-height: 38px; }
+    .blog-return { position: relative; isolation: isolate; min-height: 38px; padding: 0 16px; overflow: hidden; border: 1px solid rgba(104,225,255,.44); border-radius: 12px; color: #effcff; background: linear-gradient(115deg, rgba(45,129,183,.22), rgba(104,76,211,.3)); box-shadow: 0 0 0 1px rgba(121,143,255,.08) inset, 0 0 22px rgba(71,157,255,.13); font-size: 13px; font-weight: 720; letter-spacing: .02em; transition: transform .28s, border-color .28s, box-shadow .28s, color .28s; animation: blogPulse 4.8s ease-in-out infinite; }
+    .blog-return::before { content: ""; position: absolute; inset: -1px; z-index: -2; border-radius: inherit; background: linear-gradient(110deg, rgba(83,221,255,.24), rgba(92,116,255,.12), rgba(156,103,255,.28)); }
+    .blog-return::after { content: ""; position: absolute; top: -70%; left: -52%; z-index: -1; width: 42%; height: 240%; transform: rotate(24deg); background: linear-gradient(90deg, transparent, rgba(255,255,255,.92), transparent); filter: blur(2px); opacity: 0; }
+    .blog-return:hover { transform: translateY(-2px) scale(1.035); border-color: rgba(166,244,255,.88); color: #fff; box-shadow: 0 0 0 1px rgba(180,241,255,.2) inset, 0 8px 28px rgba(64,150,255,.3), 0 0 42px rgba(131,92,255,.22); }
+    .blog-return:hover::after { opacity: 1; animation: blogShine .72s cubic-bezier(.2,.7,.2,1) forwards; }
+    .button.primary { border-color: transparent; background: linear-gradient(120deg, #466eff, #8c5cff); box-shadow: 0 12px 36px rgba(82,88,255,.32), inset 0 1px rgba(255,255,255,.25); }
+    .button:hover, .nav-cta:hover { transform: translateY(-2px); border-color: rgba(153,179,255,.55); box-shadow: 0 16px 40px rgba(44,62,150,.25); }
+    .hero { position: relative; min-height: 100vh; padding: 140px 0 82px; display: grid; align-items: center; overflow: hidden; }
+    .hero-grid { display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: 46px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; padding: 7px 11px; border: 1px solid rgba(119,147,255,.18); border-radius: 999px; background: rgba(84,103,220,.08); color: #a9baff; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); animation: breathe 2.4s ease-in-out infinite; }
+    h1 { margin: 24px 0 22px; font-size: clamp(56px, 6.3vw, 92px); line-height: .98; letter-spacing: -.065em; }
+    h1 .gradient { display: block; color: transparent; background: linear-gradient(105deg, #ffffff 5%, #b8c5ff 48%, #76ddff 95%); -webkit-background-clip: text; background-clip: text; }
+    .hero-copy h2 { margin: 0 0 17px; font-size: clamp(23px, 3vw, 36px); line-height: 1.25; letter-spacing: -.03em; font-weight: 580; }
+    .hero-copy > p { max-width: 610px; margin: 0; color: var(--muted); font-size: 17px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .hero-note { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 28px; color: #6f7e9e; font-size: 12px; }
+    .hero-note span::before { content: ""; display: inline-block; width: 4px; height: 4px; margin: 0 8px 2px 0; border-radius: 50%; background: #6b7ba2; }
+    .core-stage { position: relative; width: min(620px, 100%); aspect-ratio: 1; margin-left: auto; perspective: 900px; }
+    .core-stage::before { content: ""; position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(circle, rgba(81,117,255,.16), transparent 64%); filter: blur(18px); animation: halo 5s ease-in-out infinite; }
+    .core-svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 20px 55px rgba(17,31,103,.5)); }
+    .orbit { fill: none; stroke: rgba(123,151,255,.15); stroke-width: 1; stroke-dasharray: 3 9; transform-origin: 300px 300px; animation: spin 38s linear infinite; }
+    .orbit.rev { animation-direction: reverse; animation-duration: 28s; }
+    .connector { fill: none; stroke: url(#lineGradient); stroke-width: 1.5; opacity: .75; stroke-dasharray: 5 10; animation: dash 3s linear infinite; }
+    .node-ring { fill: rgba(10,16,31,.92); stroke: rgba(131,163,255,.38); stroke-width: 1.2; }
+    .node-dot { fill: #88dfff; filter: url(#svgGlow); animation: breathe 2.5s ease-in-out infinite; }
+    .node-text { fill: #dce5ff; font-size: 12px; font-weight: 620; text-anchor: middle; }
+    .node-sub { fill: #6f7fa3; font-size: 9px; text-anchor: middle; }
+    .core-outer { fill: rgba(67,85,196,.1); stroke: rgba(129,155,255,.25); stroke-width: 1.5; animation: coreRing 4s ease-in-out infinite; transform-origin: 300px 300px; }
+    .core-mid { fill: url(#coreGradient); stroke: rgba(216,226,255,.75); stroke-width: 1.5; filter: url(#svgGlow); }
+    .core-inner { fill: none; stroke: rgba(255,255,255,.28); stroke-width: 1; stroke-dasharray: 2 5; transform-origin: 300px 300px; animation: spin 12s linear infinite reverse; }
+    .core-title { fill: white; font-size: 13px; font-weight: 750; text-anchor: middle; }
+    .core-status { fill: #62efaf; font-size: 9px; text-anchor: middle; letter-spacing: .15em; }
+    .packet { fill: #b8eeff; filter: url(#svgGlow); }
+    .scroll-hint { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 9px; color: #697593; font-size: 10px; letter-spacing: .16em; }
+    .mouse { width: 18px; height: 29px; border: 1px solid #586886; border-radius: 12px; position: relative; }
+    .mouse::after { content: ""; position: absolute; top: 5px; left: 50%; width: 2px; height: 6px; margin-left: -1px; border-radius: 3px; background: #92a8d7; animation: scrollDot 1.8s ease infinite; }
+    section { position: relative; padding: 130px 0; }
+    .section-label { margin-bottom: 17px; color: #778dff; font-size: 11px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+    .section-title { max-width: 820px; margin: 0; font-size: clamp(38px, 5.2vw, 68px); line-height: 1.08; letter-spacing: -.052em; }
+    .section-desc { max-width: 680px; margin: 24px 0 0; color: var(--muted); font-size: 18px; }
+    .reveal { opacity: 0; transform: translateY(34px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 72px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--line); box-shadow: var(--shadow); }
+    .stat { position: relative; min-height: 250px; padding: 40px; background: linear-gradient(145deg, rgba(16,24,45,.9), rgba(8,12,23,.92)); overflow: hidden; }
+    .stat::after { content: ""; position: absolute; width: 180px; height: 180px; right: -90px; bottom: -90px; border-radius: 50%; background: radial-gradient(circle, rgba(89,115,255,.2), transparent 68%); }
+    .stat-value { display: block; margin: 23px 0 4px; font-size: clamp(48px, 6vw, 78px); line-height: 1; letter-spacing: -.055em; font-weight: 720; }
+    .stat-unit { color: #8fa2db; font-size: 15px; }
+    .stat p { color: var(--muted); margin: 26px 0 0; font-size: 14px; }
+    .converge { position: absolute; inset: 24px 24px auto auto; width: 86px; height: 86px; opacity: .36; }
+    .converge i { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: converge 2.5s ease-in-out infinite; }
+    .converge i:nth-child(1){left:3px;top:4px;--x:36px;--y:34px}.converge i:nth-child(2){right:3px;top:8px;--x:-35px;--y:30px;animation-delay:.4s}.converge i:nth-child(3){left:5px;bottom:3px;--x:34px;--y:-37px;animation-delay:.8s}.converge i:nth-child(4){right:5px;bottom:8px;--x:-33px;--y:-31px;animation-delay:1.2s}.converge b{position:absolute;width:13px;height:13px;border-radius:50%;background:var(--purple);left:37px;top:36px;box-shadow:0 0 18px var(--purple)}
+    .original-flow { margin-top: 26px; padding: 22px 26px; display: flex; align-items: center; justify-content: center; gap: 18px; border: 1px solid var(--line); border-radius: 20px; background: rgba(7,11,22,.7); color: #a8b3cf; font-size: 13px; }
+    .mini-nodes { display: flex; gap: 7px; }
+    .mini-nodes i { width: 9px; height: 9px; border-radius: 50%; background: #42527b; box-shadow: 0 0 0 4px rgba(74,92,139,.12); animation: breathe 2s ease-in-out infinite; }
+    .mini-nodes i:nth-child(2){animation-delay:.3s;background:#536dcb}.mini-nodes i:nth-child(3){animation-delay:.6s;background:#6b55c7}.mini-nodes i:nth-child(4){animation-delay:.9s;background:#388eb1}
+    .pain-stage { display: grid; grid-template-columns: 1fr 120px 1fr; align-items: center; gap: 30px; margin-top: 70px; min-height: 500px; }
+    .chaos, .order { position: relative; height: 450px; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(20,25,43,.72), rgba(7,10,19,.82)); overflow: hidden; box-shadow: var(--shadow); }
+    .stage-caption { position: absolute; left: 24px; top: 20px; z-index: 4; color: #75819f; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+    .chaos-window { position: absolute; width: 180px; padding: 16px; border: 1px solid rgba(255,95,118,.25); border-radius: 14px; background: rgba(35,19,30,.82); box-shadow: 0 15px 40px rgba(0,0,0,.34); opacity: 0; transform: scale(.65) rotate(var(--r)); animation: chaosIn 5s ease-in-out infinite; animation-delay: var(--d); }
+    .chaos-window b { font-size: 12px; color: #ff9aaa; }
+    .chaos-window span { display: block; height: 5px; margin-top: 9px; border-radius: 4px; background: rgba(255,255,255,.09); }
+    .chaos-window span:last-child { width: 65%; }
+    .chaos-window:nth-of-type(2){left:12%;top:20%;--r:-8deg;--d:0s}.chaos-window:nth-of-type(3){right:8%;top:27%;--r:7deg;--d:.5s}.chaos-window:nth-of-type(4){left:22%;top:48%;--r:4deg;--d:1s}.chaos-window:nth-of-type(5){right:14%;bottom:9%;--r:-5deg;--d:1.5s}.chaos-window:nth-of-type(6){left:5%;bottom:12%;--r:10deg;--d:2s}
+    .transform-arrow { position: relative; display: grid; place-items: center; height: 100%; }
+    .transform-arrow::before { content: ""; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, #6a79ff, transparent); }
+    .transform-arrow::after { content: "→"; position: absolute; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid rgba(129,150,255,.35); border-radius: 50%; background: #0a0e1b; color: #a7b3ff; font-size: 22px; box-shadow: 0 0 30px rgba(94,94,255,.23); }
+    .order { display: grid; place-items: center; }
+    .order-core { position: relative; width: 205px; height: 205px; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, rgba(96,94,255,.2), rgba(43,54,135,.08) 50%, transparent 70%); }
+    .order-core::before, .order-core::after { content: ""; position: absolute; border: 1px solid rgba(130,159,255,.25); border-radius: 50%; animation: coreRing 4s ease-in-out infinite; }
+    .order-core::before { inset: 12px; }.order-core::after { inset: -30px; animation-delay: -2s; }
+    .order-chip { width: 116px; height: 116px; display: grid; place-items: center; text-align: center; border: 1px solid rgba(179,194,255,.55); border-radius: 30px; background: linear-gradient(145deg, #3d54c9, #6d4ec5); box-shadow: 0 0 60px rgba(75,88,255,.34); font-size: 13px; font-weight: 700; }
+    .order-item { position: absolute; min-width: 88px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 10px; background: #0c1221; color: #9babcb; text-align: center; font-size: 11px; animation: float 4s ease-in-out infinite; }
+    .order-item:nth-child(2){top:18%;left:11%}.order-item:nth-child(3){top:17%;right:10%;animation-delay:-1s}.order-item:nth-child(4){bottom:17%;left:13%;animation-delay:-2s}.order-item:nth-child(5){bottom:18%;right:11%;animation-delay:-3s}
+    .timeline { position: relative; max-width: 900px; margin: 78px auto 0; }
+    .timeline::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: linear-gradient(180deg, transparent, rgba(113,136,255,.45) 8%, rgba(113,136,255,.45) 92%, transparent); }
+    .timeline-item { position: relative; width: 50%; padding: 0 60px 68px 0; }
+    .timeline-item:nth-child(even) { margin-left: 50%; padding: 0 0 68px 60px; }
+    .timeline-dot { position: absolute; right: -9px; top: 26px; width: 18px; height: 18px; border: 4px solid #080c17; border-radius: 50%; background: var(--red); box-shadow: 0 0 20px rgba(255,95,118,.4); transition: background 1s .35s, box-shadow 1s .35s; }
+    .timeline-item:nth-child(even) .timeline-dot { right: auto; left: -9px; }
+    .timeline-card { padding: 25px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(145deg, rgba(17,24,43,.88), rgba(7,11,21,.9)); transform: translateY(22px); opacity: 0; transition: opacity .8s, transform .8s; }
+    .timeline-item.visible .timeline-card { opacity: 1; transform: translateY(0); }
+    .timeline-item.visible .timeline-dot { background: var(--green); box-shadow: 0 0 22px rgba(80,231,164,.55); }
+    .timeline-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+    .timeline-head h3 { margin: 0; font-size: 22px; }
+    .state { display: flex; align-items: center; gap: 7px; color: #ff899c; font-size: 11px; transition: color .7s .3s; }
+    .state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--red); transition: background .7s .3s; }
+    .timeline-item.visible .state { color: #6eeab2; }
+    .timeline-item.visible .state::before { background: var(--green); }
+    .fix-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; }
+    .fix-row b { color: #ff8396; font-weight: 600; }.fix-row strong { color: #6be8ae; font-weight: 600; }.fix-row i { color: #6f7ca0; font-style: normal; }
+    .architecture { margin-top: 70px; padding: 32px; border: 1px solid var(--line); border-radius: 32px; background: linear-gradient(160deg, rgba(15,22,40,.82), rgba(5,8,16,.86)); box-shadow: var(--shadow); }
+    .layer { position: relative; display: grid; grid-template-columns: 150px 1fr; gap: 24px; align-items: center; min-height: 132px; }
+    .layer + .layer { border-top: 1px solid rgba(255,255,255,.06); }
+    .layer-name { color: #6e7b99; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+    .layer-items { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+    .arch-item { min-width: 140px; padding: 17px 20px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.035); text-align: center; color: #c0cae1; font-size: 13px; }
+    .arch-item.gateway { min-width: 330px; border-color: rgba(122,142,255,.5); background: linear-gradient(110deg, rgba(59,86,204,.42), rgba(118,68,194,.38)); color: white; font-size: 16px; font-weight: 720; box-shadow: 0 0 50px rgba(70,76,208,.19); }
+    .architecture .flow-line { position: absolute; left: calc(150px + 50%); top: 116px; width: 1px; height: 164px; background: linear-gradient(var(--cyan), var(--purple)); z-index: 3; }
+    .architecture .flow-line::after { content: ""; position: absolute; left: -3px; width: 7px; height: 18px; border-radius: 5px; background: #d9f8ff; box-shadow: 0 0 14px var(--cyan); animation: dataDown 2.2s linear infinite; }
+    .nas-scene { display: grid; grid-template-columns: 1.1fr .9fr; gap: 60px; align-items: center; margin-top: 72px; }
+    .home-lab { position: relative; min-height: 520px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 34px; background: radial-gradient(circle at 50% 48%, rgba(63,78,191,.19), transparent 38%), linear-gradient(145deg, rgba(16,22,39,.75), rgba(6,9,17,.88)); overflow: hidden; box-shadow: var(--shadow); }
+    .home-lab::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(105,128,215,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(105,128,215,.05) 1px, transparent 1px); background-size: 36px 36px; mask-image: radial-gradient(circle, black, transparent 78%); }
+    .device-core { position: relative; z-index: 3; width: 190px; height: 190px; display: grid; place-items: center; text-align: center; border: 1px solid rgba(153,171,255,.42); border-radius: 50%; background: radial-gradient(circle at 42% 35%, rgba(115,213,255,.28), rgba(76,83,215,.26) 36%, rgba(12,17,32,.94) 72%); box-shadow: 0 0 75px rgba(67,82,231,.3), inset 0 0 35px rgba(122,153,255,.16); animation: float 5s ease-in-out infinite; }
+    .device-core::before, .device-core::after { content: ""; position: absolute; border: 1px solid rgba(118,151,255,.2); border-radius: 50%; animation: coreRing 4s ease-in-out infinite; }
+    .device-core::before { inset: -24px; }.device-core::after { inset: 20px; animation-delay: -2s; }
+    .device-core strong { display: block; font-size: 15px; letter-spacing: .08em; }.device-core small { display: block; margin-top: 5px; color: var(--green); font-size: 9px; letter-spacing: .18em; }
+    .device { position: absolute; z-index: 3; min-width: 105px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 14px; background: rgba(9,14,26,.88); text-align: center; color: #aebbd4; font-size: 11px; animation: float 4s ease-in-out infinite; }
+    .device::before { content: ""; display: block; width: 22px; height: 16px; margin: 0 auto 7px; border: 1px solid #7383a9; border-radius: 3px; }.device.phone::before { width: 10px; height: 18px; border-radius: 3px; }.device.agent::before { border-radius: 50%; background: radial-gradient(circle, #83dcff 0 20%, transparent 24%); }
+    .device.pc { left: 9%; top: 17%; }.device.phone { right: 10%; top: 20%; animation-delay:-1.2s }.device.agent { right: 12%; bottom: 14%; animation-delay:-2.2s }.device.family { left: 8%; bottom: 15%; animation-delay:-3.1s }
+    .home-link { position: absolute; z-index: 1; width: 32%; height: 1px; background: linear-gradient(90deg, transparent, rgba(91,210,255,.58), transparent); transform-origin: center; animation: linkGlow 2s ease-in-out infinite; }.home-link.l1{left:24%;top:35%;transform:rotate(30deg)}.home-link.l2{right:22%;top:36%;transform:rotate(-29deg)}.home-link.l3{right:22%;bottom:31%;transform:rotate(31deg)}.home-link.l4{left:23%;bottom:31%;transform:rotate(-31deg)}
+    .nas-copy .feature { display: flex; gap: 14px; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,.07); }.feature-number { flex: 0 0 28px; color: #7388ff; font-size: 11px; letter-spacing: .1em; }.feature h3 { margin: 0 0 5px; font-size: 19px; }.feature p { margin: 0; color: var(--muted); font-size: 14px; }
+    .audience-grid, .platform-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 15px; margin-top: 58px; }
+    .platform-grid { grid-template-columns: repeat(5,1fr); }
+    .glass-card { position: relative; min-height: 190px; padding: 25px; overflow: hidden; border: 1px solid var(--line); border-radius: 21px; background: linear-gradient(145deg, rgba(20,27,49,.72), rgba(7,11,21,.78)); transition: transform .35s, border-color .35s, background .35s; }
+    .glass-card:hover { transform: translateY(-6px); border-color: var(--line-bright); background: linear-gradient(145deg, rgba(28,38,70,.76), rgba(9,14,28,.82)); }
+    .glass-card::after { content: ""; position: absolute; width: 120px; height: 120px; right: -60px; top: -60px; border-radius: 50%; background: radial-gradient(circle, rgba(99,116,255,.18), transparent 68%); }
+    .card-icon { width: 41px; height: 41px; display: grid; place-items: center; margin-bottom: 34px; border: 1px solid rgba(139,164,255,.22); border-radius: 13px; color: #acc8ff; background: rgba(86,109,221,.1); font-size: 14px; font-weight: 760; }
+    .glass-card h3 { margin: 0 0 8px; font-size: 18px; }.glass-card p { margin: 0; color: var(--muted); font-size: 13px; }
+    .platform-grid .glass-card { min-height: 165px; }.platform-grid .card-icon { margin-bottom: 22px; }
+    .provider-link { cursor: pointer; }
+    .provider-link .apply-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; color: #91b8ff; font-size: 12px; font-weight: 650; transition: color .25s, gap .25s; }
+    .provider-link:hover .apply-link { color: #c5e5ff; gap: 10px; }
+    .capabilities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 62px; }
+    .capability-card { position: relative; min-height: 270px; padding: 28px; overflow: hidden; border: 1px solid var(--line); border-radius: 23px; background: linear-gradient(145deg, rgba(19,27,50,.78), rgba(7,11,21,.86)); transition: transform .35s, border-color .35s, background .35s; }
+    .capability-card:hover { transform: translateY(-6px); border-color: rgba(126,155,255,.4); background: linear-gradient(145deg, rgba(27,38,72,.82), rgba(9,14,28,.9)); }
+    .capability-card::after { content: ""; position: absolute; width: 170px; height: 170px; right: -90px; bottom: -100px; border-radius: 50%; background: radial-gradient(circle, var(--glow, rgba(85,120,255,.2)), transparent 70%); }
+    .capability-no { display: flex; align-items: center; justify-content: space-between; color: #697798; font-size: 10px; letter-spacing: .16em; }
+    .capability-no i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent, var(--blue)); box-shadow: 0 0 13px var(--accent, var(--blue)); }
+    .capability-card h3 { margin: 50px 0 10px; font-size: 21px; letter-spacing: -.02em; }.capability-card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .capability-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 19px; }.capability-tags span { padding: 5px 8px; border: 1px solid rgba(140,158,216,.13); border-radius: 7px; color: #8493b7; background: rgba(255,255,255,.025); font-size: 10px; }
+    .gateway-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 12px; }.gateway-pills span { padding: 4px 8px; border: 1px solid rgba(222,227,255,.18); border-radius: 999px; color: #c9d1f3; background: rgba(255,255,255,.06); font-size: 9px; font-weight: 520; }
+    .steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 15px; margin-top: 62px; counter-reset: steps; }
+    .step { min-height: 260px; padding: 27px; border-top: 2px solid rgba(101,126,255,.8); border-radius: 0 0 22px 22px; background: linear-gradient(180deg, rgba(81,104,220,.1), rgba(12,17,31,.68) 30%); }
+    .step::before { counter-increment: steps; content: "0" counter(steps); display: block; margin-bottom: 54px; color: #7187ff; font-size: 12px; font-weight: 700; letter-spacing: .14em; }
+    .step h3 { margin: 0 0 8px; font-size: 22px; }.step p { margin: 0; color: var(--muted); font-size: 14px; }
+    .device-support { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 32px; }.device-support span { padding: 8px 13px; border: 1px solid var(--line); border-radius: 999px; color: #93a1bf; background: rgba(255,255,255,.03); font-size: 12px; }
+    .disclaimer { padding: 42px; display: grid; grid-template-columns: auto 1fr; gap: 25px; align-items: start; border: 1px solid rgba(255,198,109,.18); border-radius: 24px; background: linear-gradient(145deg, rgba(76,55,23,.16), rgba(18,16,15,.62)); }
+    .disclaimer-icon { width: 43px; height: 43px; display: grid; place-items: center; border: 1px solid rgba(255,198,109,.25); border-radius: 50%; color: var(--amber); }.disclaimer h3 { margin: 0 0 8px; font-size: 20px; }.disclaimer p { margin: 0; color: #b5aa96; }
+    .final { padding: 145px 0 115px; text-align: center; overflow: hidden; }.final::before { content: ""; position: absolute; width: 700px; height: 320px; left: 50%; bottom: -160px; transform: translateX(-50%); border-radius: 50%; background: rgba(68,70,228,.22); filter: blur(75px); }.final .section-title, .final .section-desc { margin-left: auto; margin-right: auto; }.final .actions { justify-content: center; }
+    footer { padding: 35px 0 55px; border-top: 1px solid rgba(255,255,255,.07); color: #63708c; font-size: 12px; }.footer-row { display: flex; justify-content: space-between; gap: 24px; }.footer-row strong { color: #d8deef; font-weight: 650; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes dash { to { stroke-dashoffset: -45; } }
+    @keyframes breathe { 0%,100%{opacity:.55;transform:scale(.88)}50%{opacity:1;transform:scale(1.12)} }
+    @keyframes halo { 0%,100%{transform:scale(.9);opacity:.65}50%{transform:scale(1.08);opacity:1} }
+    @keyframes coreRing { 0%,100%{transform:scale(.88);opacity:.25}50%{transform:scale(1.05);opacity:.8} }
+    @keyframes scrollDot { 0%{transform:translateY(0);opacity:0}30%{opacity:1}100%{transform:translateY(10px);opacity:0} }
+    @keyframes converge { 0%,100%{transform:translate(0,0);opacity:.4}50%{transform:translate(var(--x,36px),var(--y,36px));opacity:1} }
+    @keyframes chaosIn { 0%,100%{opacity:0;transform:scale(.7) rotate(var(--r)) translateY(20px)}18%,72%{opacity:1;transform:scale(1) rotate(var(--r)) translateY(0)}82%{opacity:.2} }
+    @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)} }
+    @keyframes dataDown { 0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:146px;opacity:0} }
+    @keyframes linkGlow { 0%,100%{opacity:.25}50%{opacity:1;box-shadow:0 0 12px rgba(83,221,255,.4)} }
+    @keyframes blogShine { from { left: -52%; } to { left: 125%; } }
+    @keyframes blogPulse { 0%,82%,100% { box-shadow: 0 0 0 1px rgba(121,143,255,.08) inset, 0 0 22px rgba(71,157,255,.13); } 88% { box-shadow: 0 0 0 1px rgba(154,238,255,.25) inset, 0 0 38px rgba(71,179,255,.34); } 94% { box-shadow: 0 0 0 1px rgba(143,126,255,.22) inset, 0 0 32px rgba(137,91,255,.28); } }
+    @media (max-width: 980px) {
+      .hero-grid, .nas-scene { grid-template-columns: 1fr; }
+      .hero-copy { text-align: center; }.hero-copy > p { margin: auto; }.hero .actions, .hero-note { justify-content: center; }.core-stage { margin: 10px auto 0; max-width: 570px; }
+      .stats { grid-template-columns: 1fr; }.stat { min-height: 200px; }
+      .audience-grid { grid-template-columns: repeat(2,1fr); }.platform-grid { grid-template-columns: repeat(3,1fr); }.capabilities-grid { grid-template-columns: repeat(2,1fr); }.steps { grid-template-columns: repeat(2,1fr); }
+      .layer { grid-template-columns: 1fr; gap: 12px; padding: 25px 0; }.layer-name { text-align: center; }.architecture .flow-line { display: none; }
+    }
+    @media (max-width: 720px) {
+      .container { width: min(100% - 28px, 1180px); }.nav { top: 9px; height: 56px; padding-left: 13px; }.nav-links { display: none; }.brand { font-size: 11px; }.brand-mark { width: 22px; height: 22px; }.nav-cta { display: none; }.blog-return { min-height: 36px; padding: 0 12px; font-size: 12px; }
+      .hero { padding: 115px 0 72px; }.hero-grid { gap: 22px; }h1 { font-size: 54px; }.core-stage { width: 110%; margin-left: -5%; }.scroll-hint { display:none; }
+      section { padding: 92px 0; }.section-title { font-size: 40px; }.section-desc { font-size: 16px; }
+      .pain-stage { grid-template-columns: 1fr; gap: 18px; }.transform-arrow { height: 60px; transform: rotate(90deg); }.chaos,.order { height: 380px; }
+      .timeline::before { left: 8px; }.timeline-item,.timeline-item:nth-child(even){width:100%;margin-left:0;padding:0 0 52px 42px}.timeline-dot,.timeline-item:nth-child(even) .timeline-dot{left:0;right:auto}
+      .architecture { padding: 18px; }.arch-item.gateway { min-width: 100%; }.arch-item { min-width: calc(50% - 7px); }.home-lab { min-height: 430px; }.nas { transform: scale(.86); }.device { min-width: 82px; padding: 9px; }
+      .audience-grid,.platform-grid,.capabilities-grid,.steps { grid-template-columns: 1fr; }.glass-card,.platform-grid .glass-card,.capability-card { min-height: auto; }.card-icon { margin-bottom: 20px; }.capability-card h3 { margin-top: 34px; }.step { min-height: 210px; }.step::before { margin-bottom: 30px; }
+      .disclaimer { grid-template-columns: 1fr; padding: 28px; }.footer-row { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <canvas id="particles" aria-hidden="true"></canvas>
+  <header class="nav">
+    <a class="brand" href="#top"><span class="brand-mark"></span>FreeLLMAPI Enhanced CN</a>
+    <nav class="nav-links" aria-label="页面导航"><a href="#origin">原版能力</a><a href="#journey">优化历程</a><a href="#features">核心功能</a><a href="#architecture">架构</a><a href="#install">安装</a></nav>
+    <div class="nav-actions"><a class="blog-return" href="https://fuliapp.top/" target="_blank" rel="noopener noreferrer" aria-label="在新页面打开福利博客">← 返回博客</a><a class="nav-cta" href="#install">开始使用</a></div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span>AI INFRASTRUCTURE · CN EDITION</div>
+          <h1><span class="gradient">FreeLLMAPI</span><span class="gradient">Enhanced CN</span></h1>
+          <h2>让强大的 AI 聚合能力，<br>真正适合中文用户。</h2>
+          <p>以 FreeLLMAPI 的 OpenAI 兼容统一入口、模型聚合与智能路由为基础，补齐国内模型接入、海外网络适配和日常设备体验，让 Windows、Mac、NAS 与 Linux 都能轻松拥有自己的 AI 中心。</p>
+          <div class="actions"><a class="button primary" href="#origin">探索产品</a><a class="button" href="#install">查看安装流程</a></div>
+          <div class="hero-note"><span>一个统一入口</span><span>国内外 AI 平台</span><span>电脑、家庭与服务器</span></div>
+        </div>
+
+        <div class="core-stage" aria-label="AI Core 动态连接网络">
+          <svg class="core-svg" viewBox="0 0 600 600" role="img">
+            <defs>
+              <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#53ddff"/><stop offset=".52" stop-color="#6287ff"/><stop offset="1" stop-color="#9c67ff"/></linearGradient>
+              <radialGradient id="coreGradient"><stop stop-color="#a6edff"/><stop offset=".22" stop-color="#668dff"/><stop offset=".72" stop-color="#7652e4"/><stop offset="1" stop-color="#231e69"/></radialGradient>
+              <filter id="svgGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <path id="p1" d="M128 115 Q210 208 273 273"/><path id="p2" d="M475 125 Q390 215 327 273"/><path id="p3" d="M95 342 Q210 335 265 310"/><path id="p4" d="M495 355 Q390 340 335 312"/><path id="p5" d="M300 500 Q300 400 300 337"/>
+            </defs>
+            <circle class="orbit" cx="300" cy="300" r="238"/><circle class="orbit rev" cx="300" cy="300" r="182"/>
+            <path class="connector" d="M128 115 Q210 208 273 273"/><path class="connector" d="M475 125 Q390 215 327 273"/><path class="connector" d="M95 342 Q210 335 265 310"/><path class="connector" d="M495 355 Q390 340 335 312"/><path class="connector" d="M300 500 Q300 400 300 337"/>
+            <g transform="translate(128 115)"><circle class="node-ring" r="47"/><circle class="node-dot" r="7"/><text class="node-text" y="68">Google</text><text class="node-sub" y="82">AI STUDIO</text></g>
+            <g transform="translate(475 125)"><circle class="node-ring" r="47"/><circle class="node-dot" r="7" style="animation-delay:-.6s"/><text class="node-text" y="68">百度千帆</text><text class="node-sub" y="82">QIANFAN</text></g>
+            <g transform="translate(95 342)"><circle class="node-ring" r="43"/><circle class="node-dot" r="7" style="animation-delay:-1.1s"/><text class="node-text" y="64">Groq</text><text class="node-sub" y="78">INFERENCE</text></g>
+            <g transform="translate(495 355)"><circle class="node-ring" r="47"/><circle class="node-dot" r="7" style="animation-delay:-1.7s"/><text class="node-text" y="68">阿里云百炼</text><text class="node-sub" y="82">BAILIAN</text></g>
+            <g transform="translate(300 500)"><circle class="node-ring" r="45"/><circle class="node-dot" r="7" style="animation-delay:-2.1s"/><text class="node-text" y="66">OpenRouter</text><text class="node-sub" y="80">MODEL CLOUD</text></g>
+            <circle class="core-outer" cx="300" cy="300" r="93"/><circle class="core-outer" cx="300" cy="300" r="73" style="animation-delay:-2s"/><circle class="core-mid" cx="300" cy="300" r="48"/><circle class="core-inner" cx="300" cy="300" r="35"/>
+            <text class="core-title" x="300" y="294">AI CORE</text><text class="core-status" x="300" y="315">HEALTHY</text>
+            <circle class="packet" r="4"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#p1"/></animateMotion></circle><circle class="packet" r="3"><animateMotion dur="2.8s" begin="-.8s" repeatCount="indefinite"><mpath href="#p2"/></animateMotion></circle><circle class="packet" r="4"><animateMotion dur="2.2s" begin="-1.3s" repeatCount="indefinite"><mpath href="#p3"/></animateMotion></circle><circle class="packet" r="3"><animateMotion dur="2.7s" begin="-.4s" repeatCount="indefinite"><mpath href="#p4"/></animateMotion></circle><circle class="packet" r="4"><animateMotion dur="2.5s" begin="-1.8s" repeatCount="indefinite"><mpath href="#p5"/></animateMotion></circle>
+          </svg>
+        </div>
+      </div>
+      <div class="scroll-hint"><div class="mouse"></div>SCROLL TO EXPLORE</div>
+    </section>
+
+    <section id="origin">
+      <div class="container">
+        <div class="reveal"><div class="section-label">THE FOUNDATION</div><h2 class="section-title">强大的原版能力，<br>是增强版的坚实底座。</h2><p class="section-desc">FreeLLMAPI 本身已经是优秀的开源 AI 聚合项目：一个兼容入口，统一连接多个 LLM Provider、模型与免费模型生态。</p></div>
+        <div class="stats reveal">
+          <article class="stat"><span class="stat-unit">已聚合</span><strong class="stat-value"><span data-count="18">0</span></strong><span class="stat-unit">Providers</span><p>不同 AI 服务汇聚到一个兼容入口。</p><div class="converge"><i></i><i></i><i></i><i></i><b></b></div></article>
+          <article class="stat"><span class="stat-unit">可管理</span><strong class="stat-value"><span data-count="161">0</span></strong><span class="stat-unit">Models</span><p>模型列表、健康状态与调用方式统一管理。</p><div class="converge"><i></i><i></i><i></i><i></i><b></b></div></article>
+          <article class="stat"><span class="stat-unit">生态累计</span><strong class="stat-value"><span data-count="1.7" data-decimal="1">0</span>B</strong><span class="stat-unit">Tokens</span><p>免费模型生态正在服务真实的 AI 使用场景。</p><div class="converge"><i></i><i></i><i></i><i></i><b></b></div></article>
+        </div>
+        <div class="original-flow reveal"><span>多个 AI Provider</span><div class="mini-nodes"><i></i><i></i><i></i><i></i></div><span>→</span><strong>OpenAI 兼容统一入口</strong><span>→</span><span>应用与 Agent</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="reveal"><div class="section-label">FROM CHAOS TO CLARITY</div><h2 class="section-title">问题不是没有模型，<br>而是连接太复杂。</h2><p class="section-desc">国内模型接入、海外网络、Key、模型名称、代理和健康状态交织在一起。Enhanced CN 把这些复杂度收进一个清晰的中心。</p></div>
+        <div class="pain-stage reveal">
+          <div class="chaos"><div class="stage-caption">分散与混乱</div><div class="chaos-window"><b>API KEY</b><span></span><span></span></div><div class="chaos-window"><b>MODEL</b><span></span><span></span></div><div class="chaos-window"><b>ENDPOINT</b><span></span><span></span></div><div class="chaos-window"><b>PROXY</b><span></span><span></span></div><div class="chaos-window"><b>CONFIG</b><span></span><span></span></div></div>
+          <div class="transform-arrow"></div>
+          <div class="order"><div class="stage-caption">统一与可见</div><div class="order-core"><div class="order-chip">FreeLLMAPI<br>Enhanced CN</div></div><div class="order-item">统一入口</div><div class="order-item">健康检查</div><div class="order-item">模型管理</div><div class="order-item">自由切换</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="journey">
+      <div class="container">
+        <div class="reveal"><div class="section-label">REAL-WORLD OPTIMIZATION</div><h2 class="section-title">来自真实使用场景的<br>四次关键增强。</h2><p class="section-desc">每一项优化都从实际失败开始，以稳定、清晰、可恢复的使用体验结束。</p></div>
+        <div class="timeline">
+          <div class="timeline-item"><span class="timeline-dot"></span><article class="timeline-card"><div class="timeline-head"><h3>Google Gemini</h3><span class="state">修复完成</span></div><div class="fix-row"><b>Timeout</b><i>→</i><strong>Proxy 优化</strong></div></article></div>
+          <div class="timeline-item"><span class="timeline-dot"></span><article class="timeline-card"><div class="timeline-head"><h3>Groq</h3><span class="state">修复完成</span></div><div class="fix-row"><b>Health Error</b><i>→</i><strong>状态优化</strong></div></article></div>
+          <div class="timeline-item"><span class="timeline-dot"></span><article class="timeline-card"><div class="timeline-head"><h3>百度千帆</h3><span class="state">接入完成</span></div><div class="fix-row"><b>缺少支持</b><i>→</i><strong>Provider 适配</strong></div></article></div>
+          <div class="timeline-item"><span class="timeline-dot"></span><article class="timeline-card"><div class="timeline-head"><h3>阿里云百炼</h3><span class="state">接入完成</span></div><div class="fix-row"><b>接口差异</b><i>→</i><strong>Provider 接入</strong></div></article></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <div class="reveal"><div class="section-label">CORE CAPABILITIES</div><h2 class="section-title">保留强大聚合能力，<br>补齐中文用户体验。</h2><p class="section-desc">Enhanced CN 不重做 FreeLLMAPI，而是在成熟底座上增加国内平台、网络兼容和普通用户所需的安装与管理体验。</p></div>
+        <div class="capabilities-grid reveal">
+          <article class="capability-card" style="--accent:#50e7a4;--glow:rgba(80,231,164,.2)"><div class="capability-no"><span>01 · DOMESTIC AI</span><i></i></div><h3>国内模型原生支持</h3><p>百度千帆与阿里云百炼成为内置平台，添加自己的 Key 后即可统一管理模型与健康状态。</p><div class="capability-tags"><span>百度千帆</span><span>阿里百炼</span><span>模型目录</span></div></article>
+          <article class="capability-card" style="--accent:#53ddff;--glow:rgba(83,221,255,.2)"><div class="capability-no"><span>02 · NETWORK</span><i></i></div><h3>海外网络兼容优化</h3><p>为 Google Gemini、Groq 等海外服务增加代理环境适配，改善超时、连接失败与健康误判。</p><div class="capability-tags"><span>代理支持</span><span>超时优化</span><span>健康检查</span></div></article>
+          <article class="capability-card" style="--accent:#7f8fff"><div class="capability-no"><span>03 · EASY START</span><i></i></div><h3>Windows 与 Mac 友好</h3><p>普通用户可以从自己的电脑开始，不需要先购买 NAS，也不需要理解复杂的基础设施。</p><div class="capability-tags"><span>Windows</span><span>Mac</span><span>小白教程</span></div></article>
+          <article class="capability-card" style="--accent:#9c67ff;--glow:rgba(156,103,255,.2)"><div class="capability-no"><span>04 · ROUTING</span><i></i></div><h3>统一路由与模型切换</h3><p>保留 FreeLLMAPI 的模型聚合与路由能力，让多个应用通过同一个入口使用不同模型。</p><div class="capability-tags"><span>统一入口</span><span>自动路由</span><span>故障转移</span></div></article>
+          <article class="capability-card" style="--accent:#ffc66d;--glow:rgba(255,198,109,.18)"><div class="capability-no"><span>05 · SECURITY</span><i></i></div><h3>Key 加密本地管理</h3><p>上游平台 Key 加密后保存在自己的设备中，应用只需要连接统一入口。</p><div class="capability-tags"><span>本地数据</span><span>加密保存</span><span>统一密钥</span></div></article>
+          <article class="capability-card" style="--accent:#62a2ff"><div class="capability-no"><span>06 · VISIBILITY</span><i></i></div><h3>可视化管理与试玩</h3><p>通过网页查看平台健康状态、模型列表和使用情况，并在试玩台快速验证模型。</p><div class="capability-tags"><span>健康状态</span><span>模型列表</span><span>试玩台</span></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="container">
+        <div class="reveal"><div class="section-label">ONE CORE, MANY MODELS</div><h2 class="section-title">一条清晰的数据路径，<br>连接所有 AI 能力。</h2></div>
+        <div class="architecture reveal">
+          <span class="flow-line"></span>
+          <div class="layer"><div class="layer-name">应用层</div><div class="layer-items"><div class="arch-item">AutoClaw</div><div class="arch-item">OpenWebUI</div><div class="arch-item">Cursor / AI Agent</div><div class="arch-item">其他兼容应用</div></div></div>
+          <div class="layer"><div class="layer-name">网关层</div><div class="layer-items"><div class="arch-item gateway">FreeLLMAPI Enhanced CN<div class="gateway-pills"><span>统一入口</span><span>智能路由</span><span>健康检查</span><span>Key 管理</span><span>用量统计</span></div></div></div></div>
+          <div class="layer"><div class="layer-name">模型层</div><div class="layer-items"><div class="arch-item">Google</div><div class="arch-item">百度千帆</div><div class="arch-item">阿里云百炼</div><div class="arch-item">Groq</div><div class="arch-item">OpenRouter</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="reveal"><div class="section-label">AI ON YOUR DEVICE</div><h2 class="section-title">无论电脑还是 NAS，<br>都能成为你的 AI 中心。</h2><p class="section-desc">Windows 和 Mac 适合大多数个人用户，NAS 与 Linux 适合希望长期运行或家庭共享的用户。你可以从手边现有的设备开始。</p></div>
+        <div class="nas-scene">
+          <div class="home-lab reveal"><span class="home-link l1"></span><span class="home-link l2"></span><span class="home-link l3"></span><span class="home-link l4"></span><div class="device pc">Windows</div><div class="device phone">Mac</div><div class="device agent">Linux</div><div class="device family">NAS</div><div class="device-core"><div><strong>AI HOST</strong><small>READY</small></div></div></div>
+          <div class="nas-copy reveal"><div class="feature"><span class="feature-number">01</span><div><h3>Windows 与 Mac</h3><p>适合绝大多数个人用户，在自己的电脑上快速开始。</p></div></div><div class="feature"><span class="feature-number">02</span><div><h3>NAS 与 Linux</h3><p>适合长期运行、家庭共享或服务器部署场景。</p></div></div><div class="feature"><span class="feature-number">03</span><div><h3>连接所有 AI 应用</h3><p>电脑、手机、自动化工具和 AI Agent 使用同一个中心。</p></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="reveal"><div class="section-label">SUPPORTED SERVICES</div><h2 class="section-title">国内外 AI 服务，<br>在一个中心协同工作。</h2><p class="section-desc">帮助你管理和使用自己的 AI 服务。平台额度、模型与规则仍由各平台决定。</p></div>
+        <div class="platform-grid reveal"><a class="glass-card provider-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer"><div class="card-icon">G</div><h3>Google AI Studio</h3><p>Gemini 模型与代理环境优化。</p><span class="apply-link">申请 API Key <b>↗</b></span></a><a class="glass-card provider-link" href="https://console.bce.baidu.com/qianfan/overview" target="_blank" rel="noopener noreferrer"><div class="card-icon">百</div><h3>百度千帆</h3><p>国内模型原生接入体验。</p><span class="apply-link">前往千帆控制台 <b>↗</b></span></a><a class="glass-card provider-link" href="https://bailian.console.aliyun.com/" target="_blank" rel="noopener noreferrer"><div class="card-icon">阿</div><h3>阿里云百炼</h3><p>通义与多模型统一管理。</p><span class="apply-link">前往百炼控制台 <b>↗</b></span></a><a class="glass-card provider-link" href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer"><div class="card-icon">GQ</div><h3>Groq</h3><p>健康状态与限流恢复优化。</p><span class="apply-link">申请 API Key <b>↗</b></span></a><a class="glass-card provider-link" href="https://openrouter.ai/settings/keys" target="_blank" rel="noopener noreferrer"><div class="card-icon">OR</div><h3>OpenRouter</h3><p>丰富的模型聚合入口。</p><span class="apply-link">申请 API Key <b>↗</b></span></a></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="reveal"><div class="section-label">BUILT FOR REAL USERS</div><h2 class="section-title">为这些真实场景而生。</h2></div>
+        <div class="audience-grid reveal"><article class="glass-card"><div class="card-icon">PC</div><h3>Windows / Mac 用户</h3><p>直接在日常电脑上建立统一 AI 入口。</p></article><article class="glass-card"><div class="card-icon">AG</div><h3>AI Agent 用户</h3><p>给 Agent 一个稳定、统一的模型入口。</p></article><article class="glass-card"><div class="card-icon">HA</div><h3>家庭自动化用户</h3><p>让家中不同应用连接合适的 AI 服务。</p></article><article class="glass-card"><div class="card-icon">NAS</div><h3>NAS / Linux 用户</h3><p>适合长期运行、共享与服务器部署。</p></article></div>
+      </div>
+    </section>
+
+    <section id="install">
+      <div class="container">
+        <div class="reveal"><div class="section-label">SIMPLE ON PURPOSE</div><h2 class="section-title">不懂技术，也能四步开始。</h2><p class="section-desc">无需理解复杂架构。跟随微信交付包中的设备教程完成安装与初始化。</p></div>
+        <div class="steps reveal"><article class="step"><h3>下载</h3><p>获取用户交付包，解压后打开“开始这里”。</p></article><article class="step"><h3>安装</h3><p>选择自己的设备，按照页面提示操作。</p></article><article class="step"><h3>初始化</h3><p>打开访问地址，使用 Setup Code 创建管理员。</p></article><article class="step"><h3>添加 Key</h3><p>添加自己的 AI 平台 Key，选择模型开始使用。</p></article></div>
+        <div class="device-support reveal"><span>群晖 NAS</span><span>Windows</span><span>Linux</span><span>Mac</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container"><div class="disclaimer reveal"><div class="disclaimer-icon">!</div><div><h3>关于免费额度</h3><p>FreeLLMAPI Enhanced CN 不会创造免费额度，也不承诺任何平台永久免费。项目只帮助用户更方便地管理和使用自己的 AI 服务。各平台的额度、定价、模型与服务规则均由平台决定。</p></div></div></div>
+    </section>
+
+    <section class="final">
+      <div class="container reveal"><div class="section-label">FREE LLM, BETTER CONNECTED</div><h2 class="section-title">让每一个 AI 应用，<br>连接到更合适的模型。</h2><p class="section-desc">FreeLLMAPI Enhanced CN v1.0.1<br>面向 Windows、Mac、NAS、Linux、家庭 AI 环境与 AI Agent 用户。</p><div class="actions"><a class="button primary" href="#install">查看安装流程</a><a class="button" href="#top">回到顶部</a></div></div>
+    </section>
+  </main>
+
+  <footer><div class="container footer-row"><div><strong>FreeLLMAPI Enhanced CN v1.0.1</strong><br>基于 FreeLLMAPI 的非官方社区增强版。</div><div>安装包与教程请通过指定渠道获取 · 请妥善保管自己的 Key</div></div></footer>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById('particles');
+      const ctx = canvas.getContext('2d');
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let w = 0, h = 0, dpr = Math.min(devicePixelRatio || 1, 2), points = [];
+      function resize(){ w = innerWidth; h = innerHeight; canvas.width = w*dpr; canvas.height = h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px'; ctx.setTransform(dpr,0,0,dpr,0,0); const count=Math.min(75,Math.floor(w/18)); points=Array.from({length:count},()=>({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,r:Math.random()*1.4+.35,a:Math.random()*.45+.12})); }
+      function draw(){ ctx.clearRect(0,0,w,h); for(const p of points){ p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(105,145,255,${p.a})`;ctx.fill(); } for(let i=0;i<points.length;i++){for(let j=i+1;j<points.length;j++){const a=points[i],b=points[j],dx=a.x-b.x,dy=a.y-b.y,dist=Math.hypot(dx,dy);if(dist<115){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(91,120,214,${(1-dist/115)*.07})`;ctx.stroke();}}} if(!reduced)requestAnimationFrame(draw); }
+      resize(); draw(); addEventListener('resize',resize,{passive:true});
+      const reveals=document.querySelectorAll('.reveal,.timeline-item');
+      const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.16});
+      reveals.forEach(el=>observer.observe(el));
+      const counters=document.querySelectorAll('[data-count]');
+      const countObserver=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting||e.target.dataset.done)return;e.target.dataset.done='1';const end=+e.target.dataset.count,decimal=+e.target.dataset.decimal||0,start=performance.now(),duration=1500;function tick(now){const t=Math.min(1,(now-start)/duration),ease=1-Math.pow(1-t,3);e.target.textContent=(end*ease).toFixed(decimal);if(t<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)}),{threshold:.7});
+      counters.forEach(el=>countObserver.observe(el));
+      const progress=document.getElementById('progress');
+      addEventListener('scroll',()=>{const max=document.documentElement.scrollHeight-innerHeight;progress.style.width=(scrollY/max*100)+'%'},{passive:true});
+      if(!reduced){const stage=document.querySelector('.core-stage');stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;stage.querySelector('svg').style.transform=`rotateX(${-y*5}deg) rotateY(${x*7}deg)`});stage.addEventListener('pointerleave',()=>stage.querySelector('svg').style.transform='rotateX(0) rotateY(0)');}
+    })();
+  </script>
+</body>
+</html>
