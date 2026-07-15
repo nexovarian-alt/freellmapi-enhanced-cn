@@ -1,15 +1,70 @@
 import { getDb } from '../db/index.js';
 import { resolveProvider } from '../providers/index.js';
 import { decrypt } from '../lib/crypto.js';
-import type { Platform, KeyStatus } from '@freellmapi/shared/types.js';
+import type { Platform, KeyStatus, ProviderDiagnostic, DiagnosticStatus } from '@freellmapi/shared/types.js';
 import { inferQuotaPoolKey } from './provider-quota.js';
 import type { Scheduler } from '../lib/scheduler.js';
 
-const CHECK_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-const CONSECUTIVE_FAILURES_TO_DISABLE = 3;
+const CHECK_INTERVAL_MS = 5 * 60 * 1000;
+const CONSECUTIVE_AUTH_FAILURES_TO_DISABLE = 3;
 
-// Track consecutive failures per key
-const failureCount = new Map<number, number>();
+type DiagnosticWrite = Omit<ProviderDiagnostic, 'keyId' | 'checkedAt'>;
+
+function diagnosticMessage(platform: string, kind: 'healthy' | 'network' | 'auth' | 'quota' | 'provider' | 'missing'): string {
+  if (kind === 'healthy') return `${platform} 连接、认证和模型检测正常。`;
+  if (kind === 'network') return `${platform} 当前无法连接。请检查代理是否已启动，以及 PROXY_URL 是否可从容器访问。`;
+  if (kind === 'auth') return `${platform} 认证失败。请确认 API Key 后重新检测；系统不会因单次失败立即停用。`;
+  if (kind === 'quota') return `${platform} 当前额度不足或请求过于频繁，请稍后重新检测。`;
+  if (kind === 'missing') return `${platform} 未检测到 API Key，请重新填写 API Key。`;
+  return `${platform} 服务已响应，但本次模型检测异常。建议稍后立即重新检测。`;
+}
+
+function readFailureCount(keyId: number): number {
+  const row = getDb().prepare(
+    'SELECT consecutive_failures FROM provider_diagnostics WHERE key_id = ?',
+  ).get(keyId) as { consecutive_failures: number } | undefined;
+  return row?.consecutive_failures ?? 0;
+}
+
+function writeDiagnostic(keyId: number, value: DiagnosticWrite): void {
+  getDb().prepare(`
+    INSERT INTO provider_diagnostics (
+      key_id, network_status, api_status, auth_status, quota_status,
+      model_status, message, consecutive_failures, checked_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    ON CONFLICT(key_id) DO UPDATE SET
+      network_status = excluded.network_status,
+      api_status = excluded.api_status,
+      auth_status = excluded.auth_status,
+      quota_status = excluded.quota_status,
+      model_status = excluded.model_status,
+      message = excluded.message,
+      consecutive_failures = excluded.consecutive_failures,
+      checked_at = excluded.checked_at
+  `).run(
+    keyId, value.network, value.api, value.auth, value.quota,
+    value.model, value.message, value.consecutiveFailures,
+  );
+}
+
+function updateKeyStatus(keyId: number, status: KeyStatus): void {
+  getDb().prepare("UPDATE api_keys SET status = ?, last_checked_at = datetime('now') WHERE id = ?")
+    .run(status, keyId);
+}
+
+function recoverAutoDisabledKey(keyId: number): boolean {
+  const result = getDb().prepare(
+    'UPDATE api_keys SET enabled = 1, auto_disabled = 0 WHERE id = ? AND auto_disabled = 1',
+  ).run(keyId);
+  if (result.changes > 0) console.log(`[Health] Auto-recovered key ${keyId} after a successful check`);
+  return result.changes > 0;
+}
+
+function errorStatus(err: unknown): number | undefined {
+  if (!err || typeof err !== 'object') return undefined;
+  const value = (err as { status?: unknown }).status;
+  return typeof value === 'number' ? value : undefined;
+}
 
 export async function checkKeyHealth(keyId: number): Promise<KeyStatus> {
   const db = getDb();
@@ -17,10 +72,28 @@ export async function checkKeyHealth(keyId: number): Promise<KeyStatus> {
   if (!row) return 'error';
 
   const provider = resolveProvider(row.platform as Platform, row.base_url);
-  if (!provider) return 'error';
+  if (!provider) {
+    const failures = readFailureCount(keyId) + 1;
+    updateKeyStatus(keyId, 'error');
+    writeDiagnostic(keyId, {
+      network: 'unknown', api: 'error', auth: 'unknown', quota: 'unknown', model: 'error',
+      message: diagnosticMessage(row.platform, 'provider'), consecutiveFailures: failures,
+    });
+    return 'error';
+  }
 
   try {
     const apiKey = decrypt(row.encrypted_key, row.iv, row.auth_tag);
+    if (!provider.keyless && !apiKey.trim()) {
+      const failures = readFailureCount(keyId) + 1;
+      updateKeyStatus(keyId, failures >= CONSECUTIVE_AUTH_FAILURES_TO_DISABLE ? 'invalid' : 'error');
+      writeDiagnostic(keyId, {
+        network: 'unknown', api: 'error', auth: 'failed', quota: 'unknown', model: 'unknown',
+        message: diagnosticMessage(row.platform, 'missing'), consecutiveFailures: failures,
+      });
+      return failures >= CONSECUTIVE_AUTH_FAILURES_TO_DISABLE ? 'invalid' : 'error';
+    }
+
     const isValid = await provider.validateKey(apiKey, {
       platform: row.platform as Platform,
       keyId,
@@ -29,64 +102,80 @@ export async function checkKeyHealth(keyId: number): Promise<KeyStatus> {
       origin: 'health',
     });
 
-    const status: KeyStatus = isValid ? 'healthy' : 'invalid';
-
-    db.prepare("UPDATE api_keys SET status = ?, last_checked_at = datetime('now') WHERE id = ?")
-      .run(status, keyId);
-
     if (isValid) {
-      failureCount.delete(keyId);
-    } else {
-      const count = (failureCount.get(keyId) ?? 0) + 1;
-      failureCount.set(keyId, count);
-
-      if (count >= CONSECUTIVE_FAILURES_TO_DISABLE) {
-        db.prepare('UPDATE api_keys SET enabled = 0 WHERE id = ?').run(keyId);
-        console.log(`[Health] Auto-disabled key ${keyId} after ${count} consecutive failures`);
-      }
+      updateKeyStatus(keyId, 'healthy');
+      recoverAutoDisabledKey(keyId);
+      writeDiagnostic(keyId, {
+        network: 'normal', api: 'normal', auth: 'normal', quota: 'normal', model: 'normal',
+        message: diagnosticMessage(row.platform, 'healthy'), consecutiveFailures: 0,
+      });
+      return 'healthy';
     }
 
+    const failures = readFailureCount(keyId) + 1;
+    const confirmedInvalid = failures >= CONSECUTIVE_AUTH_FAILURES_TO_DISABLE;
+    const status: KeyStatus = confirmedInvalid ? 'invalid' : 'error';
+    updateKeyStatus(keyId, status);
+    writeDiagnostic(keyId, {
+      network: 'normal', api: 'error', auth: 'failed', quota: 'unknown', model: 'unknown',
+      message: diagnosticMessage(row.platform, 'auth'), consecutiveFailures: failures,
+    });
+
+    if (confirmedInvalid && row.enabled === 1) {
+      db.prepare('UPDATE api_keys SET enabled = 0, auto_disabled = 1 WHERE id = ?').run(keyId);
+      console.log(`[Health] Auto-disabled key ${keyId} after ${failures} consecutive confirmed authentication failures`);
+    }
     return status;
   } catch (err: any) {
-    // Transport errors (DNS/timeout/TLS) — provider unreachable, not necessarily
-    // a bad key. Mark status='error' but do NOT increment failure counter — auto-
-    // disable is reserved for confirmed 401/403 (returned by validateKey as false).
-    // Include platform + base_url so a flapping CloudFront edge or DNS failure is
-    // attributable to the responsible provider in one log read. The leading
-    // "[Health] Key N (" prefix is preserved so the 12-hourly crash watchdog
-    // (cron bff5ae167d28) that scrapes /tmp/freellmapi.log for these lines
-    // continues to match unchanged.
+    const statusCode = errorStatus(err);
+    const previousFailures = readFailureCount(keyId);
+
+    if (statusCode === 429) {
+      updateKeyStatus(keyId, 'rate_limited');
+      recoverAutoDisabledKey(keyId);
+      writeDiagnostic(keyId, {
+        network: 'normal', api: 'error', auth: 'normal', quota: 'insufficient', model: 'unknown',
+        message: diagnosticMessage(row.platform, 'quota'), consecutiveFailures: 0,
+      });
+      return 'rate_limited';
+    }
+
+    const failures = previousFailures + 1;
+    const network: DiagnosticStatus = statusCode === undefined ? 'error' : 'normal';
     console.error(
       `[Health] Key ${keyId} (${row.platform}, base=${row.base_url ?? 'default'}) ` +
       `transport error: ${err.message}`,
     );
-    db.prepare("UPDATE api_keys SET status = ?, last_checked_at = datetime('now') WHERE id = ?")
-      .run('error', keyId);
+    updateKeyStatus(keyId, 'error');
+    writeDiagnostic(keyId, {
+      network,
+      api: 'error',
+      auth: 'unknown',
+      quota: 'unknown',
+      model: statusCode === undefined ? 'unknown' : 'error',
+      message: diagnosticMessage(row.platform, statusCode === undefined ? 'network' : 'provider'),
+      consecutiveFailures: failures,
+    });
     return 'error';
   }
 }
 
-// Overlap guard: the scheduled 5-minute pass and wake-recovery re-probes can
-// coincide (or SIGCONT spam can queue several) — concurrent full passes
-// multiply provider validate traffic and let two passes each increment the
-// same genuinely-bad key's failureCount, reaching the auto-disable threshold
-// in fewer wall-clock checks than "3 consecutive checks" intends. A second
-// caller joins the in-flight pass instead of starting another.
 let checkAllInFlight: Promise<void> | null = null;
 
 export function checkAllKeys(): Promise<void> {
   if (checkAllInFlight) return checkAllInFlight;
   checkAllInFlight = (async () => {
     const db = getDb();
-    const keys = db.prepare('SELECT id, platform FROM api_keys WHERE enabled = 1').all() as { id: number; platform: string }[];
+    // Include only keys that are active or were disabled by the health checker.
+    // User-disabled keys remain untouched; auto-disabled keys keep getting probes
+    // so a corrected key/network can recover without re-adding credentials.
+    const keys = db.prepare(
+      'SELECT id, platform FROM api_keys WHERE enabled = 1 OR auto_disabled = 1',
+    ).all() as { id: number; platform: string }[];
 
     console.log(`[Health] Checking ${keys.length} keys...`);
-
-    for (const key of keys) {
-      await checkKeyHealth(key.id);
-    }
-
-    console.log(`[Health] Check complete.`);
+    for (const key of keys) await checkKeyHealth(key.id);
+    console.log('[Health] Check complete.');
   })().finally(() => {
     checkAllInFlight = null;
   });

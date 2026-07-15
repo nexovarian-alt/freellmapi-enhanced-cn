@@ -1,4 +1,4 @@
-import type { ApiKeyModel, Platform, ProviderQuotaState } from '../../../../shared/types'
+import type { ApiKeyModel, Platform, ProviderDiagnostic, ProviderQuotaState } from '../../../../shared/types'
 import { ExternalLink } from 'lucide-react'
 import { useI18n } from '@/i18n'
 
@@ -110,6 +110,6 @@ export interface HealthPlatform {
 
 export interface HealthData {
   platforms: HealthPlatform[]
-  keys: { id: number; platform: string; status: string; lastCheckedAt: string | null }[]
+  keys: { id: number; platform: string; status: string; lastCheckedAt: string | null; diagnostic?: ProviderDiagnostic }[]
   quotaStates: ProviderQuotaState[]
 }

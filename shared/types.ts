@@ -163,6 +163,20 @@ export interface ModelListRow {
 
 export type KeyStatus = 'healthy' | 'rate_limited' | 'invalid' | 'error' | 'unknown';
 
+export type DiagnosticStatus = 'normal' | 'error' | 'failed' | 'insufficient' | 'unknown';
+
+export interface ProviderDiagnostic {
+  keyId: number;
+  network: DiagnosticStatus;
+  api: DiagnosticStatus;
+  auth: DiagnosticStatus;
+  quota: DiagnosticStatus;
+  model: DiagnosticStatus;
+  message: string;
+  consecutiveFailures: number;
+  checkedAt: string | null;
+}
+
 export interface ApiKeyModel {
   id: number;
   kind: 'chat' | 'embedding' | 'image' | 'audio';

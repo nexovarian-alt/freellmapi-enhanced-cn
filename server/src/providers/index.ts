@@ -61,6 +61,9 @@ register(new OpenAICompatProvider({
   platform: 'openrouter',
   name: 'OpenRouter',
   baseUrl: 'https://openrouter.ai/api/v1',
+  // /models is public and returns 200 even for a bad Authorization header.
+  // /auth/key verifies the credential and exposes its current quota metadata.
+  validateUrl: 'https://openrouter.ai/api/v1/auth/key',
   extraHeaders: {
     'HTTP-Referer': 'http://localhost:3001',
     'X-Title': 'FreeLLMAPI',

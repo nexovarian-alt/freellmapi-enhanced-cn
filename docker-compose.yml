@@ -1,6 +1,6 @@
 services:
   freellmapi:
-    image: ghcr.io/tashfeenahmed/freellmapi:latest
+    image: ${FREELLMAPI_IMAGE:-ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0}
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,6 +9,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3001
+      PROXY_URL: ${PROXY_URL:-}
+      NODE_OPTIONS: --require=/app/bootstrap-proxy.cjs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     # Bound to localhost by default — FreeLLMAPI is single-user and must not be
     # exposed to the internet. Set HOST_BIND=0.0.0.0 to reach it from your LAN.
     ports:

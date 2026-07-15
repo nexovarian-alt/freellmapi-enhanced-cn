@@ -64,6 +64,31 @@ docker compose pull
 docker compose up -d
 ```
 
+### Upgrade from Enhanced CN v1.0.1 to v1.1.0
+
+Keep the existing `.env`, `ENCRYPTION_KEY`, and `freellmapi-data` volume. Replace
+only the application container:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Do not run `docker compose down -v`; `-v` deletes the database volume. The v1.1
+schema migration is additive and preserves existing accounts, keys, Provider
+configuration, models, and routing settings.
+
+### Proxy settings for China
+
+Add one line to `.env`, then recreate the container with `docker compose up -d`:
+
+- Windows / macOS Docker Desktop: `PROXY_URL=http://host.docker.internal:7890`
+- NAS / Linux: `PROXY_URL=http://192.168.1.2:7890` (use the proxy host LAN IP)
+
+Clash, sing-box, V2Ray, Surge, or another proxy must be running and must allow
+LAN connections. No Docker networking knowledge is required: use the first
+address on Docker Desktop and the second form on a NAS.
+
 Rebuild locally from source:
 
 ```bash

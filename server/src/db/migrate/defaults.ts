@@ -8,6 +8,7 @@ import * as requestClientInfo from '../migrations/20260706_000001_request_client
 import * as customModelToolSupport from '../migrations/20260706_000002_custom_model_tool_support.js';
 import * as enhancedChineseProviders from '../migrations/20260713_000001_enhanced_chinese_providers.js';
 import * as domesticModelPool from '../migrations/20260713_000002_domestic_model_pool.js';
+import * as providerDiagnostics from '../migrations/20260715_000001_provider_diagnostics.js';
 
 export interface MigrationModule {
   up(db: Db): void;
@@ -28,6 +29,7 @@ export const REQUEST_CLIENT_INFO_FILENAME = '20260706_000001_request_client_info
 export const CUSTOM_MODEL_TOOL_SUPPORT_FILENAME = '20260706_000002_custom_model_tool_support.ts';
 export const ENHANCED_CHINESE_PROVIDERS_FILENAME = '20260713_000001_enhanced_chinese_providers.ts';
 export const DOMESTIC_MODEL_POOL_FILENAME = '20260713_000002_domestic_model_pool.ts';
+export const PROVIDER_DIAGNOSTICS_FILENAME = '20260715_000001_provider_diagnostics.ts';
 
 export const DEFAULT_MIGRATIONS: readonly DefaultMigration[] = [
   { filename: LEGACY_BASELINE_FILENAME, module: legacyBaseline },
@@ -39,4 +41,5 @@ export const DEFAULT_MIGRATIONS: readonly DefaultMigration[] = [
   { filename: CUSTOM_MODEL_TOOL_SUPPORT_FILENAME, module: customModelToolSupport },
   { filename: ENHANCED_CHINESE_PROVIDERS_FILENAME, module: enhancedChineseProviders },
   { filename: DOMESTIC_MODEL_POOL_FILENAME, module: domesticModelPool },
+  { filename: PROVIDER_DIAGNOSTICS_FILENAME, module: providerDiagnostics },
 ];

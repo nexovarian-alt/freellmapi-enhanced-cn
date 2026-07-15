@@ -231,7 +231,7 @@
     "addingCustom": "添加中…",
     "getApiKey": "获取 API 密钥",
     "deleteKeyConfirm": "确认删除此密钥?此操作无法撤销。",
-    "checkAll": "全部检查",
+    "checkAll": "立即检测全部 Provider",
     "checking": "检查中…",
     "editLabel": "编辑标签",
     "saveLabel": "保存标签",
@@ -322,7 +322,18 @@
     "exportKeys plural": "keys",
     "exporting": "Exporting…",
     "exportDownload": "Download",
-    "exportSuccess": "Exported {count} keys"
+    "exportSuccess": "Exported {count} keys",
+    "diagnosticNetwork": "网络",
+    "diagnosticAuth": "认证",
+    "diagnosticQuota": "额度",
+    "diagnosticModel": "模型"
+  },
+  "diagnostic": {
+    "normal": "正常",
+    "error": "异常",
+    "failed": "失败",
+    "insufficient": "不足",
+    "unknown": "未知"
   },
   "status": {
     "healthy": "健康",

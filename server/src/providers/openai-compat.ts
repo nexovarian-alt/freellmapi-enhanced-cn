@@ -283,7 +283,11 @@ export class OpenAICompatProvider extends BaseProvider {
       quotaPoolKey: quotaContext?.quotaPoolKey,
       endpoint: 'models',
     });
-    return res.status !== 401 && res.status !== 403;
+    if (res.status === 401 || res.status === 403) return false;
+    if (!res.ok) {
+      throw providerHttpError(res, `${this.name} key validation returned HTTP ${res.status}`);
+    }
+    return true;
   }
 }
 

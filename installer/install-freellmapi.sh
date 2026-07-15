@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-IMAGE="${FREELLMAPI_IMAGE:-ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.0.0}"
+IMAGE="${FREELLMAPI_IMAGE:-ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0}"
 PORT="${FREELLMAPI_PORT:-3104}"
 INSTALL_DIR="${FREELLMAPI_INSTALL_DIR:-$HOME/.freellmapi-enhanced-cn}"
 CONTAINER="freellmapi-enhanced-cn"
@@ -31,10 +31,21 @@ else
   ENCRYPTION_KEY="$(openssl rand -hex 32)"
 fi
 [[ "$ENCRYPTION_KEY" =~ ^[0-9a-fA-F]{64}$ ]] || fail "Existing ENCRYPTION_KEY is invalid; refusing to risk unreadable API keys."
-{
-  printf 'ENCRYPTION_KEY=%s\n' "$ENCRYPTION_KEY"
-  [[ -n "${PROXY_URL:-}" ]] && printf 'PROXY_URL=%s\n' "$PROXY_URL"
-} > "$ENV_FILE"
+if [[ ! -f "$ENV_FILE" ]]; then
+  {
+    printf 'ENCRYPTION_KEY=%s\n' "$ENCRYPTION_KEY"
+    [[ -n "${PROXY_URL:-}" ]] && printf 'PROXY_URL=%s\n' "$PROXY_URL"
+  } > "$ENV_FILE"
+elif [[ -n "${PROXY_URL:-}" ]]; then
+  # Upgrade in place without discarding any existing environment settings.
+  awk -v proxy="$PROXY_URL" '
+    BEGIN { replaced=0 }
+    /^PROXY_URL=/ { if (!replaced) print "PROXY_URL=" proxy; replaced=1; next }
+    { print }
+    END { if (!replaced) print "PROXY_URL=" proxy }
+  ' "$ENV_FILE" > "$ENV_FILE.tmp"
+  mv "$ENV_FILE.tmp" "$ENV_FILE"
+fi
 chmod 600 "$ENV_FILE"
 
 echo "Pulling $IMAGE"
@@ -42,6 +53,8 @@ docker pull "$IMAGE"
 docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
 docker run -d --name "$CONTAINER" --restart unless-stopped \
   --env-file "$ENV_FILE" -e NODE_ENV=production \
+  -e NODE_OPTIONS=--require=/app/bootstrap-proxy.cjs \
+  --add-host=host.docker.internal:host-gateway \
   -e FREEAPI_DB_PATH=/app/server/data/freeapi.db \
   -p "${PORT}:3001" -v "$DATA_DIR:/app/server/data" "$IMAGE" >/dev/null
 
@@ -49,7 +62,7 @@ for _ in $(seq 1 45); do
   if curl --fail --silent "http://127.0.0.1:${PORT}/api/ping" >/dev/null 2>&1; then
     SETUP_CODE="$(docker logs "$CONTAINER" 2>&1 | sed -n 's/.*\(setup code\|Setup Code\)[: ]*//p' | head -n1 || true)"
     LAN_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
-    printf '\n================================\nFreeLLMAPI Enhanced CN v1.0.0 installation complete\n================================\n\n'
+    printf '\n================================\nFreeLLMAPI Enhanced CN v1.1.0 installation complete\n================================\n\n'
     echo 'Install status: Success'
     echo "Container: $CONTAINER"
     echo "Docker status: $(docker inspect -f '{{.State.Status}}' "$CONTAINER")"

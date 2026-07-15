@@ -276,7 +276,7 @@
     "addingCustom": "Adding…",
     "getApiKey": "Get API key",
     "deleteKeyConfirm": "Delete this key? This cannot be undone.",
-    "checkAll": "Check all",
+    "checkAll": "Check all providers now",
     "checking": "Checking…",
     "editLabel": "Edit label",
     "saveLabel": "Save label",
@@ -339,7 +339,18 @@
     "quotaLimit": "Limit",
     "quotaRemaining": "Remaining",
     "quotaReset": "Reset",
-    "quotaObserved": "Observed"
+    "quotaObserved": "Observed",
+    "diagnosticNetwork": "Network",
+    "diagnosticAuth": "Authentication",
+    "diagnosticQuota": "Quota",
+    "diagnosticModel": "Model"
+  },
+  "diagnostic": {
+    "normal": "normal",
+    "error": "problem",
+    "failed": "failed",
+    "insufficient": "insufficient",
+    "unknown": "unknown"
   },
   "status": {
     "healthy": "healthy",

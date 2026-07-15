@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OpenAICompatProvider } from '../../providers/openai-compat.js';
+import { resolveProvider } from '../../providers/index.js';
 
 describe('OpenAICompatProvider', () => {
   let provider: OpenAICompatProvider;
@@ -255,6 +256,17 @@ describe('OpenAICompatProvider', () => {
   it('validateKey propagates transport errors instead of swallowing', async () => {
     vi.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('ECONNREFUSED'));
     await expect(provider.validateKey('any')).rejects.toThrow(/ECONNREFUSED/);
+  });
+
+  it('OpenRouter validates against its authenticated endpoint, not public /models', async () => {
+    let capturedUrl = '';
+    vi.spyOn(global, 'fetch').mockImplementationOnce(async (url) => {
+      capturedUrl = String(url);
+      return { ok: false, status: 401, headers: new Headers() } as any;
+    });
+    const openrouter = resolveProvider('openrouter')!;
+    expect(await openrouter.validateKey('bad')).toBe(false);
+    expect(capturedUrl).toBe('https://openrouter.ai/api/v1/auth/key');
   });
 
   it('folds reasoning_content into content when content is empty (Z.ai glm-4.5-flash style)', async () => {

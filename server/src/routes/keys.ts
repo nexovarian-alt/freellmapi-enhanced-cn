@@ -8,6 +8,7 @@ import { resolveProvider } from '../providers/index.js';
 import { encrypt, decrypt, maskKey } from '../lib/crypto.js';
 import { parseKeysFromFile, stripJsoncComments, stripTrailingCommas } from '../lib/key-parser.js';
 import { assessProviderUrl } from '../lib/url-guard.js';
+import { checkKeyHealth } from '../services/health.js';
 
 export const keysRouter = Router();
 
@@ -350,8 +351,9 @@ keysRouter.post('/', (req: Request, res: Response) => {
     VALUES (?, ?, ?, ?, ?, 'unknown', 1)
   `).run(platform, label ?? '', encrypted, iv, authTag);
 
+  const keyId = Number(result.lastInsertRowid);
   res.status(201).json({
-    id: result.lastInsertRowid,
+    id: keyId,
     platform,
     label: label ?? '',
     maskedKey: maskKey(keyToStore),
@@ -359,6 +361,12 @@ keysRouter.post('/', (req: Request, res: Response) => {
     enabled: true,
     modelsAvailable: enabledModelCount(platform),
     notice: noModelsNotice(platform),
+  });
+
+  // Saving remains fast, while a background probe immediately replaces the
+  // initial "unknown" state. The normal 5-minute checker remains as fallback.
+  void checkKeyHealth(keyId).catch(err => {
+    console.error(`[Health] Post-save check failed for key ${keyId}: ${err?.message ?? err}`);
   });
 });
 
@@ -776,7 +784,9 @@ keysRouter.patch('/platform/:platform', (req: Request, res: Response) => {
   }
 
   const db = getDb();
-  const result = db.prepare('UPDATE api_keys SET enabled = ? WHERE platform = ?').run(enabled ? 1 : 0, platform);
+  const result = db.prepare(
+    'UPDATE api_keys SET enabled = ?, auto_disabled = 0 WHERE platform = ?',
+  ).run(enabled ? 1 : 0, platform);
 
   res.json({ success: true, enabled, updatedKeys: result.changes });
 });
@@ -802,6 +812,9 @@ keysRouter.patch('/:id', (req: Request, res: Response) => {
   if (enabled !== undefined) {
     updates.push('enabled = ?');
     values.push(enabled ? 1 : 0);
+    // An explicit user toggle takes ownership from the health checker. In
+    // particular, turning a key off must prevent a later automatic re-enable.
+    updates.push('auto_disabled = 0');
   }
   if (label !== undefined) {
     updates.push('label = ?');

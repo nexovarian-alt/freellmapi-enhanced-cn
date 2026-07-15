@@ -31,6 +31,13 @@ healthRouter.get('/', (_req: Request, res: Response) => {
     ORDER BY platform, created_at DESC
   `).all() as any[];
 
+  const diagnostics = db.prepare(`
+    SELECT key_id, network_status, api_status, auth_status, quota_status,
+           model_status, message, consecutive_failures, checked_at
+    FROM provider_diagnostics
+  `).all() as any[];
+  const diagnosticsByKey = new Map(diagnostics.map(d => [d.key_id, d]));
+
   res.json({
     platforms: platforms.map(p => ({
       platform: p.platform,
@@ -43,15 +50,29 @@ healthRouter.get('/', (_req: Request, res: Response) => {
       unknownKeys: p.unknown_keys,
       enabledKeys: p.enabled_keys,
     })),
-    keys: keys.map(k => ({
-      id: k.id,
-      platform: k.platform,
-      label: k.label,
-      status: k.status,
-      enabled: k.enabled === 1,
-      createdAt: k.created_at,
-      lastCheckedAt: k.last_checked_at,
-    })),
+    keys: keys.map(k => {
+      const d = diagnosticsByKey.get(k.id);
+      return {
+        id: k.id,
+        platform: k.platform,
+        label: k.label,
+        status: k.status,
+        enabled: k.enabled === 1,
+        createdAt: k.created_at,
+        lastCheckedAt: k.last_checked_at,
+        diagnostic: d ? {
+          keyId: k.id,
+          network: d.network_status,
+          api: d.api_status,
+          auth: d.auth_status,
+          quota: d.quota_status,
+          model: d.model_status,
+          message: d.message,
+          consecutiveFailures: d.consecutive_failures,
+          checkedAt: d.checked_at,
+        } : undefined,
+      };
+    }),
     quotaStates: getQuotaStateForKeys(),
   });
 });
@@ -65,7 +86,13 @@ healthRouter.post('/check/:keyId', async (req: Request, res: Response) => {
   }
 
   const status = await checkKeyHealth(keyId);
-  res.json({ keyId, status });
+  const diagnostic = getDb().prepare(`
+    SELECT network_status AS network, api_status AS api, auth_status AS auth,
+           quota_status AS quota, model_status AS model, message,
+           consecutive_failures AS consecutiveFailures, checked_at AS checkedAt
+    FROM provider_diagnostics WHERE key_id = ?
+  `).get(keyId);
+  res.json({ keyId, status, diagnostic });
 });
 
 // Check all keys

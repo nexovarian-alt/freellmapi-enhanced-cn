@@ -163,7 +163,7 @@ export function ProviderList({ onAddKey }: { onAddKey: () => void }) {
     }
   }, [editingKeyId])
 
-  const healthKeyMap = new Map<number, { status: string; lastCheckedAt: string | null }>()
+  const healthKeyMap = new Map<number, HealthData['keys'][number]>()
   for (const k of healthData?.keys ?? []) healthKeyMap.set(k.id, k)
   const statusOf = (k: ApiKey) => healthKeyMap.get(k.id)?.status ?? k.status
 
@@ -346,7 +346,9 @@ export function ProviderList({ onAddKey }: { onAddKey: () => void }) {
                   <div className="rounded-2xl border divide-y bg-card overflow-hidden">
                     {group.keys.map(k => {
                       const status = statusOf(k)
-                      const lastChecked = healthKeyMap.get(k.id)?.lastCheckedAt
+                      const healthKey = healthKeyMap.get(k.id)
+                      const lastChecked = healthKey?.lastCheckedAt
+                      const diagnostic = healthKey?.diagnostic
                       const isEditing = editingKeyId === k.id
                       const customModels = k.models ?? []
                       const hasCustomModels = customModels.length > 0
@@ -437,6 +439,20 @@ export function ProviderList({ onAddKey }: { onAddKey: () => void }) {
                               </ConfirmButton>
                             </div>
                           </div>
+                          {diagnostic && (
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t bg-muted/15 px-4 py-2 pl-8 text-[11px] text-muted-foreground">
+                              {(['network', 'auth', 'quota', 'model'] as const).map(item => (
+                                <span key={item}>
+                                  {t(`keys.diagnostic${item[0].toUpperCase()}${item.slice(1)}`)}:
+                                  {' '}
+                                  <span className={diagnostic[item] === 'normal' ? 'text-emerald-600' : diagnostic[item] === 'unknown' ? '' : 'text-amber-600'}>
+                                    {t(`diagnostic.${diagnostic[item]}`)}
+                                  </span>
+                                </span>
+                              ))}
+                              <span className="min-w-[240px] flex-1" title={diagnostic.message}>{diagnostic.message}</span>
+                            </div>
+                          )}
                           {hasCustomModels && isExpanded && (
                             <div className="flex flex-wrap gap-2 border-t bg-muted/20 px-4 py-3 pl-12">
                               {customModels.map(model => {

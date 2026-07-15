@@ -4,23 +4,23 @@
 
 > **Unofficial community enhancement** based on [tashfeenahmed/freellmapi](https://github.com/tashfeenahmed/freellmapi). This project is not the official FreeLLMAPI release.
 
-FreeLLMAPI Enhanced CN v1.0.0 is for personal self-hosting, learning, and experimentation. It keeps the upstream MIT license and copyright notices. Provider terms, quotas, and acceptable-use rules remain the user's responsibility.
+FreeLLMAPI Enhanced CN v1.1.0 is for personal self-hosting, learning, and experimentation. It keeps the upstream MIT license and copyright notices. Provider terms, quotas, and acceptable-use rules remain the user's responsibility.
 
 ## One-line installation
 
 Linux/NAS with Docker:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nexovarian-alt/freellmapi-enhanced-cn/v1.0.0/installer/install-freellmapi.sh | bash
+curl -fsSL https://raw.githubusercontent.com/nexovarian-alt/freellmapi-enhanced-cn/v1.1.0/installer/install-freellmapi.sh | bash
 ```
 
 Optional outbound proxy (for providers that require one):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nexovarian-alt/freellmapi-enhanced-cn/v1.0.0/installer/install-freellmapi.sh | PROXY_URL=http://proxy-host:port bash
+curl -fsSL https://raw.githubusercontent.com/nexovarian-alt/freellmapi-enhanced-cn/v1.1.0/installer/install-freellmapi.sh | PROXY_URL=http://192.168.1.2:7890 bash
 ```
 
-The installer uses the fixed `ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.0.0` image, keeps data under `~/.freellmapi-enhanced-cn`, persists `ENCRYPTION_KEY`, and prints the Setup Code after startup. It does not replace an existing original FreeLLMAPI instance; choose another `FREELLMAPI_PORT` if port 3104 is occupied.
+The installer uses the fixed `ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.1.0` image, keeps data under `~/.freellmapi-enhanced-cn`, persists `ENCRYPTION_KEY`, and prints the Setup Code after startup. It does not replace an existing original FreeLLMAPI instance; choose another `FREELLMAPI_PORT` if port 3104 is occupied.
 
 ## What is enhanced
 
@@ -28,6 +28,9 @@ The installer uses the fixed `ghcr.io/nexovarian-alt/freellmapi-enhanced-cn:v1.0
 - OpenAI-compatible request and proxy handling, including optional `HTTP_PROXY`, `HTTPS_PROXY`, or `PROXY_URL`.
 - Google AI Studio health-check timeout adjustment for slower proxied networks.
 - Domestic model catalog entries and protected local catalog migrations.
+- Process-wide Node.js proxy injection for Docker deployments in China.
+- Provider diagnostics that separate network, authentication, quota, and model state.
+- Three-strike authentication handling and automatic recovery of system-disabled keys.
 
 ## First login
 
